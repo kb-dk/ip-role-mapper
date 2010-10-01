@@ -27,6 +27,51 @@
 
 <project name="ipRoleMappingService" basedir=".">
 
+    <property name="global.dir" value="${basedir}/../../"/>
+    <property name="warfilename" value="iprolemapping.war"/>
+
+    <property file="${global.dir}/build.properties"/>
+
+    <!--Contain the normal build tasks, including war-->
+    <import file="${global.dir}/build/build-webservice-module.xml"/>
+
+    <!--The location of the fedora schemas-->
+    <!--fileset id="schema.files" dir="${basedir}/data/fedora-return-types">
+        <include name="*.xsd"/>
+    </fileset-->
+
+    <!--Project libs used by this module-->
+    <dirset id="project.libs" dir="${global.dir}/lib/">
+        <include name="${sbutils.lib}"/>
+        <include name="${domsutils.lib}"/>
+        <include name="${surveillance.lib}"/>
+        <include name="${commons-logging.lib}"/>
+    </dirset>
+
+    <!--dirset id="build.project.libs" dir="${global.dir}/lib/">
+        <include name="${servlet.lib}"/>
+    </dirset-->
+
+    <!-- dirset id="module.dependencies" dir="${global.dir}/modules/">
+        <include name="repository"/>
+        <include name="services/view"/>
+        <include name="services/validator"/>
+        <include name="services/templates"/>
+        <include name="fedoraconnectors/fedoraclient"/>
+    </dirset-->
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
     <property name="global.dir" value="${basedir}/../.."/>
 
     <!--Contain the normal build tasks, including war-->
