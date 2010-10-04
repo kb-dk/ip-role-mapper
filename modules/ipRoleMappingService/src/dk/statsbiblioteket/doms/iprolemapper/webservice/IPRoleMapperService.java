@@ -26,14 +26,18 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
-import javax.ws.rs.Path;
-//import javax.ws.rs.core.Context;
-//import javax.ws.rs.core.Response;
-import javax.ws.rs.Produces;
-import javax.ws.rs.PathParam;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
 
 //import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 //
@@ -43,7 +47,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
- * 
  */
 @Path("/")
 public class IPRoleMapperService {
@@ -63,10 +66,13 @@ public class IPRoleMapperService {
     @GET
     @Path("getRoles/{ipaddress}")
     @Produces("text/xml")
-    public String getRoles(@PathParam("ipaddress") String ipAddress) {
+    public String getRoles(@PathParam("ipaddress") String ipAddress)
+            throws UnknownHostException {
         log.trace("IPRoleMapperService.getRoles(): Called with IP adress: '"
                 + ipAddress + "'");
-        return "<hello>" + ipAddress + "</hello>";
-    }
 
+        IPRoleMapper ipRoleMapper = new IPRoleMapper();
+        // FIXME! It has not been initialised yet!
+        return ipRoleMapper.mapIPHost(InetAddress.getByName(ipAddress));
+    }
 }
