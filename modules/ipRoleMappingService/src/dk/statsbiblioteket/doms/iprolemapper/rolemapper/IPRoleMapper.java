@@ -28,73 +28,106 @@ package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
 import java.net.InetAddress;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
+ * The <code>IPRoleMapper</code> is capable of associating a number of roles
+ * with an IP address based on a number of IP address ranges, which again are
+ * associated with a number of roles.
  * 
+ * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
  */
 public class IPRoleMapper {
 
-    private TreeSet<InetAddress> rangeStartAddresses;
-
-    private static TreeMap<InetAddress, HashSet<IPRange>> startAddrRangeMapSet;
-
     /**
-     * 
+     * A map for mapping an IP range start address to a list of all IP ranges
+     * starting at that particular address.
      */
-    public IPRoleMapper() {
-    }
+    private static TreeMap<InetAddress, LinkedList<IPRange>> startAddrRangeMapList;
 
     /**
-     * Map a host name or IP address to one or more roles.
+     * Map a host name or IP address to one or more roles all roles of the known
+     * ip ranges matching <code>ipAddress</code> will be collected. The roles
+     * are returned as a comma separated list in a <code>String</code>.
      * 
      * @param ipAddress
-     * @return
+     *            the IP address or host name to get roles for.
+     * @return a <code>String</code> containing a comma separated list of all
+     *         matching roles.
      */
-    public String mapIPHost(InetAddress ipAddress) {
-        String collectedRoles = "";
-        synchronized (startAddrRangeMapSet) {
-            // Get all ranges starting before or at the given ipAddress.
-            Collection<HashSet<IPRange>> allPotentialMatchingRangeSets = startAddrRangeMapSet
-                    .headMap(ipAddress, true).values();
-            
-            for (HashSet<IPRange> potentialMatchingRangeSet : allPotentialMatchingRangeSets) {
-                
-                for (IPRange candidateRange : potentialMatchingRangeSet) {
-                    InetAddressComparator ipComparator = new InetAddressComparator();
-                    if (ipComparator.compare(ipAddress, candidateRange.getBeginAddress()) == 0) {
-                        List<String> rangeRoles = candidateRange.getRoles();
-                        for (int roleIdx = 0; roleIdx < rangeRoles.size(); roleIdx++) {
-                            collectedRoles += rangeRoles.get(roleIdx);
-                            if (roleIdx < rangeRoles.size() - 1) {
-                                collectedRoles += ",";
-                                //FIXME! Hmm, setting commas will not be that easy. It's probably better collecting roles first and then building the string afterwards.
-                            }
-                        }
-                    }
-                }
-            }
+    public synchronized String mapIPHost(InetAddress ipAddress) {
+
+        final Set<String> collectedRoles = new TreeSet<String>();
+
+        // Get all ranges starting before or at the given ipAddress.
+        final Collection<LinkedList<IPRange>> allPotentialMatchingRangeSets = startAddrRangeMapList
+                .headMap(ipAddress, true).values();
+
+        final InetAddressComparator ipComparator = new InetAddressComparator();
+        for (List<IPRange> potentialMatchingRanges : allPotentialMatchingRangeSets) {
+
+            for (IPRange candidateRange : potentialMatchingRanges) {
+
+                // Test ipAddress lies within the candidate range.
+                if ((ipComparator.compare(ipAddress, candidateRange
+                        .getBeginAddress()) == 0 || ipComparator.compare(
+                        ipAddress, candidateRange.getBeginAddress()) > 0)
+                        && (ipComparator.compare(ipAddress, candidateRange
+                                .getEndAddress()) == 0 || ipComparator.compare(
+                                ipAddress, candidateRange.getEndAddress()) < 0)) {
+
+                    // Range match! Collect the roles from this range into a
+                    // set in order to eliminate any duplicates.
+                    collectedRoles.addAll(candidateRange.getRoles());
+                } // end-if
+            } // end-for test of candidate range list.
         }
-        return collectedRoles;
+
+        // Build the result string.
+        String resultString = "";
+        final Iterator<String> roleIterator = collectedRoles.iterator();
+        while (roleIterator.hasNext()) {
+            resultString += roleIterator.next();
+
+            // Append a comma if there are more roles left.
+            if (roleIterator.hasNext()) {
+                resultString += ",";
+            }
+        }// end-while
+
+        return resultString;
     }
 
-    public static void init(List<IPRange> ranges) {
-        synchronized (startAddrRangeMapSet) {
-            startAddrRangeMapSet = new TreeMap<InetAddress, HashSet<IPRange>>(new InetAddressComparator());
-            for (IPRange range : ranges) {
-                HashSet<IPRange> rangeSet = startAddrRangeMapSet.get(range
-                        .getBeginAddress());
-                if (rangeSet == null) {
-                    rangeSet = new HashSet<IPRange>();
-                    startAddrRangeMapSet.put(range.getBeginAddress(), rangeSet);
-                }
-                rangeSet.add(range);
-            }// end-for
-        }
+    /**
+     * (re-)initialise the internal database over IP ranges and roles. This
+     * method should only be called for the initial initialisation and if the
+     * configuration changes.
+     * 
+     * @param ranges
+     *            a list of IP range and role information to initialise the
+     *            database with.
+     */
+    public static synchronized void init(List<IPRange> ranges) {
+
+        startAddrRangeMapList = new TreeMap<InetAddress, LinkedList<IPRange>>(
+                new InetAddressComparator());
+
+        for (IPRange range : ranges) {
+            LinkedList<IPRange> rangeList = startAddrRangeMapList.get(range
+                    .getBeginAddress());
+
+            if (rangeList == null) {
+                // No ranges with this begin address have been registered
+                // earlier. Create a container for them.
+                rangeList = new LinkedList<IPRange>();
+                startAddrRangeMapList.put(range.getBeginAddress(), rangeList);
+            }
+            rangeList.add(range);
+        }// end-for
     }
 }

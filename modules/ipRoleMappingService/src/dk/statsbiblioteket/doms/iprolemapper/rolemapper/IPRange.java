@@ -32,7 +32,7 @@ import java.util.List;
 /**
  *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
  */
-class IPRange {
+public class IPRange {
 
     private final InetAddress beginAddress;
     private final InetAddress endAddress;
@@ -53,8 +53,8 @@ class IPRange {
      *             if the begin address and end address is not of the same type.
      *             I.e. if they are not both IPv4 of IPv6 addresses.
      */
-    IPRange(InetAddress beginAddress, InetAddress endAddress, List<String> roles)
-            throws IllegalArgumentException {
+    public IPRange(InetAddress beginAddress, InetAddress endAddress,
+            List<String> roles) throws IllegalArgumentException {
         if (beginAddress.getClass() != endAddress.getClass()) {
             throw new IllegalArgumentException("The begin and end addresses "
                     + "must be of the same type. beginAddress.getClas() = "
@@ -69,14 +69,14 @@ class IPRange {
     /**
      * @return the begin address of this IP range.
      */
-    InetAddress getBeginAddress() {
+    public InetAddress getBeginAddress() {
         return beginAddress;
     }
 
     /**
      * @return the end address of this IP range.
      */
-    InetAddress getEndAddress() {
+    public InetAddress getEndAddress() {
         return endAddress;
     }
 

@@ -44,22 +44,26 @@ public class InetAddressComparator implements Comparator<InetAddress> {
                     + "inetAddress1.getClass() = " + inetAddress1.getClass()
                     + "  inetAddress2.getClass() = " + inetAddress2.getClass());
         }
-        
+
         int returnVal = 0;
         final byte inetAddress2bytes[] = inetAddress2.getAddress();
         final byte inetAddress1bytes[] = inetAddress1.getAddress();
-        
+
         // This should already be ensured by the verification of the class
         // types above.
-        assert(inetAddress1bytes.length == inetAddress2bytes.length);
-        
+        assert (inetAddress1bytes.length == inetAddress2bytes.length);
+
         for (int index = 0; index < inetAddress1bytes.length; index++) {
             if (inetAddress1bytes[index] == inetAddress2bytes[index]) {
                 // It's all good, just keep the 0 return value.
                 continue;
             }
+
+            // Convert to integer to avoid getting fooled by signed bytes.
+            final int addr1byte = inetAddress1bytes[index] & 0xff;
+            final int addr2byte = inetAddress2bytes[index] & 0xff;
             
-            if (inetAddress1bytes[index] < inetAddress2bytes[index]) {
+            if (addr1byte < addr2byte) {
                 returnVal = -1;
             } else {
                 returnVal = 1;
