@@ -26,18 +26,30 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 
+import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
+import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 
 //import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 //
@@ -52,6 +64,8 @@ import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
 public class IPRoleMapperService {
 
     private static final Log log = LogFactory.getLog(IPRoleMapperService.class);
+    private static long latestConfigFileModificationTime = -1;
+    private static String lastConfigurationFilePath = "";
 
     // @Context
     // private HttpServletRequest request;
@@ -65,14 +79,77 @@ public class IPRoleMapperService {
 
     @GET
     @Path("getRoles/{ipaddress}")
-    @Produces("text/xml")
+    @Produces("text/plain")
     public String getRoles(@PathParam("ipaddress") String ipAddress)
-            throws UnknownHostException {
+            throws XPathExpressionException, ParserConfigurationException,
+            SAXException, IOException, URISyntaxException {
         log.trace("IPRoleMapperService.getRoles(): Called with IP adress: '"
                 + ipAddress + "'");
 
-        IPRoleMapper ipRoleMapper = new IPRoleMapper();
-        // FIXME! It has not been initialised yet!
-        return ipRoleMapper.mapIPHost(InetAddress.getByName(ipAddress));
+        verifyConfiguration();
+        final IPRoleMapper ipRoleMapper = new IPRoleMapper();
+        final String roles = ipRoleMapper.mapIPHost(InetAddress
+                .getByName(ipAddress));
+
+        log.trace("IPRoleMapperService.getRoles(): returning roles: '" + roles
+                + "' for IP address: " + ipAddress);
+        return roles;
+    }
+
+    /**
+     * Check whether the IP ranges configuration has changed since last
+     * initialisation, and if so, then re-initialise IPRoleMapper.
+     * 
+     * @throws IOException
+     *             if any problems are encountered while reading the
+     *             configuration file.
+     * @throws SAXException
+     *             if any problems are encountered while parsing the
+     *             configuration file.
+     * @throws ParserConfigurationException
+     *             if any problems are encountered while preparing the XML
+     *             parser.
+     * @throws XPathExpressionException
+     *             if any problems are encountered while fetching the
+     *             information from the configuration file.
+     * @throws URISyntaxException
+     *             if the configuration file cannot be loaded.
+     */
+    private void verifyConfiguration() throws XPathExpressionException,
+            ParserConfigurationException, SAXException, IOException,
+            URISyntaxException {
+        // NOTE! Make sure that web.xml has a listener entry for the
+        // ConfigContextListener otherwise this will go very, very wrong.
+
+        final Properties configuration = ConfigCollection.getProperties();
+
+        final String rangesConfigFileName = (String) configuration
+                .get("ipRangeAndRoleConfigurationFile");
+
+        if (rangesConfigFileName == null || rangesConfigFileName.length() == 0) {
+            throw new IllegalArgumentException("Bad file name for the IP "
+                    + "address ranges configuration file: "
+                    + rangesConfigFileName);
+        }
+
+        // FIXME! I'm not quite sure that this is the best way to locate the
+        // configuration file.
+        final File rangesConfigFile = new File(ConfigCollection
+                .getServletContext().getRealPath(rangesConfigFileName));
+
+        if ((rangesConfigFile.lastModified() != latestConfigFileModificationTime)
+                || (!lastConfigurationFilePath.equals(rangesConfigFile
+                        .getAbsolutePath()))) {
+
+            latestConfigFileModificationTime = rangesConfigFile.lastModified();
+            lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
+            
+            log.info("IP ranges configuration has changed. Re-initialising.");
+            // The configuration has changed. Re-initialise.
+            final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
+            final List<IPRange> ranges = rangesReader
+                    .readFromXMLConfigFile(rangesConfigFile);
+            IPRoleMapper.init(ranges);
+        }
     }
 }

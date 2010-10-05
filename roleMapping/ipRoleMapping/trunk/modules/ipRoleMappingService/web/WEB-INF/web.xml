@@ -11,6 +11,11 @@
         <param-value>/WEB-INF/log4j.xml</param-value>
     </context-param>
 
+    <context-param>
+        <param-name>ipRangeAndRoleConfigurationFile</param-name>
+        <param-value>/WEB-INF/ipRangesAndRoles.xml</param-value>
+    </context-param>
+
     <listener>
         <listener-class>
             dk.statsbiblioteket.doms.webservices.ConfigContextListener</listener-class>
