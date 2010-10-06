@@ -29,12 +29,11 @@ package dk.statsbiblioteket.doms.iprolemapper.webservice;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -88,12 +87,24 @@ public class IPRoleMapperService {
 
         verifyConfiguration();
         final IPRoleMapper ipRoleMapper = new IPRoleMapper();
-        final String roles = ipRoleMapper.mapIPHost(InetAddress
+        final Set<String> mappedRoles = ipRoleMapper.mapIPHost(InetAddress
                 .getByName(ipAddress));
 
-        log.trace("IPRoleMapperService.getRoles(): returning roles: '" + roles
-                + "' for IP address: " + ipAddress);
-        return roles;
+        // Build the result string.
+        String rolesString = "";
+        final Iterator<String> roleIterator = mappedRoles.iterator();
+        while (roleIterator.hasNext()) {
+            rolesString += roleIterator.next();
+
+            // Append a comma if there are more roles left.
+            if (roleIterator.hasNext()) {
+                rolesString += ",";
+            }
+        }// end-while
+
+        log.trace("IPRoleMapperService.getRoles(): returning roles: '"
+                + rolesString + "' for IP address: " + ipAddress);
+        return rolesString;
     }
 
     /**
@@ -143,7 +154,7 @@ public class IPRoleMapperService {
 
             latestConfigFileModificationTime = rangesConfigFile.lastModified();
             lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
-            
+
             log.info("IP ranges configuration has changed. Re-initialising.");
             // The configuration has changed. Re-initialise.
             final IPRangesConfigReader rangesReader = new IPRangesConfigReader();

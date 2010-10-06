@@ -60,7 +60,7 @@ public class IPRoleMapper {
      * @return a <code>String</code> containing a comma separated list of all
      *         matching roles.
      */
-    public synchronized String mapIPHost(InetAddress ipAddress) {
+    public synchronized Set<String> mapIPHost(InetAddress ipAddress) {
 
         final Set<String> collectedRoles = new TreeSet<String>();
 
@@ -88,19 +88,7 @@ public class IPRoleMapper {
             } // end-for test of candidate range list.
         }
 
-        // Build the result string.
-        String resultString = "";
-        final Iterator<String> roleIterator = collectedRoles.iterator();
-        while (roleIterator.hasNext()) {
-            resultString += roleIterator.next();
-
-            // Append a comma if there are more roles left.
-            if (roleIterator.hasNext()) {
-                resultString += ",";
-            }
-        }// end-while
-
-        return resultString;
+        return collectedRoles;
     }
 
     /**

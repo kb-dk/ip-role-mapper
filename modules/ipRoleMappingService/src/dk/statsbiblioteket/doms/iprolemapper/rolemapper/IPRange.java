@@ -51,7 +51,9 @@ public class IPRange {
      *            the roles associated with the range.
      * @throws IllegalArgumentException
      *             if the begin address and end address is not of the same type.
-     *             I.e. if they are not both IPv4 of IPv6 addresses.
+     *             I.e. if they are not both IPv4 of IPv6 addresses, or if
+     *             <code>beginAddress</code> is larger/higher/after
+     *             <code>endAddress</code>.
      */
     public IPRange(InetAddress beginAddress, InetAddress endAddress,
             List<String> roles) throws IllegalArgumentException {
@@ -61,6 +63,14 @@ public class IPRange {
                     + beginAddress.getClass() + "  endAddress.getClass() = "
                     + endAddress.getClass());
         }
+
+        final InetAddressComparator comparator = new InetAddressComparator();
+        if (comparator.compare(beginAddress, endAddress) == 1) {
+            throw new IllegalArgumentException("The begin addresses must be "
+                    + "equal to or before the end address. beginAddress = "
+                    + beginAddress + "  endAddress = " + endAddress);
+        }
+
         this.beginAddress = beginAddress;
         this.endAddress = endAddress;
         this.roles = roles;
