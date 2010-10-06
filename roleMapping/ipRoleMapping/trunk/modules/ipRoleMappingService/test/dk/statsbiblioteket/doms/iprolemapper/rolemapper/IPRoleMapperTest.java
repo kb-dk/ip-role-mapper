@@ -26,18 +26,16 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -45,48 +43,88 @@ import org.junit.Test;
  */
 public class IPRoleMapperTest {
 
-    private final List<IPRange> ipRanges;
-    private IPRoleMapper ipRoleMapper;
-    
+    private final IPRoleMapper ipRoleMapper;
+
     /**
-     * @throws UnknownHostException 
-     * 
+     * @throws UnknownHostException
+     *             if any of the hard-coded IP addresses are illegal. This will
+     *             not happen.
      */
     public IPRoleMapperTest() throws UnknownHostException {
-       
-       final List<String> roles = Arrays.asList("public", "secret", "topsecret");
-       final InetAddress beginAddress = InetAddress.getByName("192.168.0.1");
-       final InetAddress endAddress = InetAddress.getByName("192.168.0.254");
-       final IPRange testRange = new IPRange(beginAddress, endAddress, roles);
-       
-       ipRanges = new LinkedList<IPRange>();
-       ipRanges.add(testRange);
-    }
-    
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-        IPRoleMapper.init(ipRanges);
+
         ipRoleMapper = new IPRoleMapper();
+        IPRoleMapper.init(createIPv4TestRanges());
     }
 
     /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    /**
-     * Test method for {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper#mapIPHost(java.net.InetAddress)}.
-     * @throws UnknownHostException 
+     * Test method for
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper#mapIPHost(java.net.InetAddress)}
+     * .
+     * 
+     * @throws UnknownHostException
+     *             if any of the hard-coded IP addresses are illegal. This will
+     *             not happen.
      */
     @Test
     public void testMapIPHost() throws UnknownHostException {
-        final InetAddress addressToMap = InetAddress.getByName("192.168.0.34");
-        final String roles = ipRoleMapper.mapIPHost(addressToMap);
-        assertEquals("public,secret,topsecret", roles);
+
+        // Check a "public" address.
+        InetAddress addressToMap = InetAddress.getByName("192.168.0.34");
+        Set<String> associatedRoles = ipRoleMapper.mapIPHost(addressToMap);
+        Set<String> expectedRoles = new HashSet<String>();
+        expectedRoles.add("public");
+        assertEquals(expectedRoles, associatedRoles);
+
+        // Check a "student" address.
+        addressToMap = InetAddress.getByName("192.168.0.128");
+        associatedRoles = ipRoleMapper.mapIPHost(addressToMap);
+
+        // Expect "public" and "student".
+        expectedRoles.add("student");
+        assertEquals(expectedRoles, associatedRoles);
+
+        // Check a "professor-student" address.
+        addressToMap = InetAddress.getByName("192.168.0.145");
+        associatedRoles = ipRoleMapper.mapIPHost(addressToMap);
+
+        // Expect "public", "student" and "professor".
+        expectedRoles.add("professor");
+        assertEquals(expectedRoles, associatedRoles);
+
+        // Check a "professor" address.
+        addressToMap = InetAddress.getByName("192.168.0.160");
+        associatedRoles = ipRoleMapper.mapIPHost(addressToMap);
+
+        // Expect "public" and "professor".
+        expectedRoles.remove("student");
+        assertEquals(expectedRoles, associatedRoles);
+    }
+
+    private List<IPRange> createIPv4TestRanges() throws UnknownHostException {
+
+        // Note: It is important that the sub-arrays in rangeSetups contain a
+        // begin address, an end address and at least one role!
+        final String[][] rangeSetups = {
+                { "192.168.0.1", "192.168.0.254", "public" },
+                { "192.168.0.123", "192.168.0.151", "student" },
+                { "192.168.0.142", "192.168.0.162", "professor" } };
+
+        final List<IPRange> ipRanges = new LinkedList<IPRange>();
+        for (String[] rangeSetup : rangeSetups) {
+
+            final InetAddress beginAddress = InetAddress
+                    .getByName(rangeSetup[0]);
+            final InetAddress endAddress = InetAddress.getByName(rangeSetup[1]);
+
+            final List<String> roles = Arrays.asList(Arrays.copyOfRange(
+                    rangeSetup, 2, rangeSetup.length));
+
+            final IPRange testRange = new IPRange(beginAddress, endAddress,
+                    roles);
+
+            ipRanges.add(testRange);
+        }
+
+        return ipRanges;
     }
 }

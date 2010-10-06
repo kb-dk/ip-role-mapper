@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -105,7 +104,7 @@ public class IPRangesConfigReader {
         for (int nodeIdx = 0; nodeIdx < ipRangeNodes.getLength(); nodeIdx++) {
             ipRangeList.add(produceIPRangeInstance(ipRangeNodes.item(nodeIdx)));
         }
-        //        
+        // FIXME! What is this?
         //        
         //
         // List<String> roles = Arrays.asList("public", "secret", "topsecret");
@@ -153,7 +152,8 @@ public class IPRangesConfigReader {
 
         final List<String> ipRangeRoles = new LinkedList<String>();
         for (int nodeIdx = 0; nodeIdx < ipRangeRoleNodes.getLength(); nodeIdx++) {
-            ipRangeRoles.add(ipRangeRoleNodes.item(nodeIdx).getTextContent().trim());
+            ipRangeRoles.add(ipRangeRoleNodes.item(nodeIdx).getTextContent()
+                    .trim());
         }
 
         return new IPRange(InetAddress.getByName(beginAddress), InetAddress
