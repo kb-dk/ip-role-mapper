@@ -104,29 +104,16 @@ public class IPRangesConfigReader {
         for (int nodeIdx = 0; nodeIdx < ipRangeNodes.getLength(); nodeIdx++) {
             ipRangeList.add(produceIPRangeInstance(ipRangeNodes.item(nodeIdx)));
         }
-        // FIXME! What is this?
-        //        
-        //
-        // List<String> roles = Arrays.asList("public", "secret", "topsecret");
-        // InetAddress beginAddress = InetAddress.getByName("172.18.0.1");
-        // InetAddress endAddress = InetAddress.getByName("172.18.255.254");
-        // IPRange testRange = new IPRange(beginAddress, endAddress, roles);
-        //
-        // ipRangeList.add(testRange);
-        //
-        // roles = Arrays.asList("banished");
-        // beginAddress = InetAddress.getByName("0.0.0.0");
-        // endAddress = InetAddress.getByName("255.255.255.255");
-        // testRange = new IPRange(beginAddress, endAddress, roles);
-        //
-        // ipRangeList.add(testRange);
 
         return ipRangeList;
     }
 
     /**
-     * @param item
-     * @return
+     * @param ipRangeNode
+     *            a <code>Document Node</code> containing information about an
+     *            IP range.
+     * @return an <code>IPRange</code> instance created from the information
+     *         contained in <code>ipRangeNode</code>.
      * @throws XPathExpressionException
      *             if any errors are encountered while reading range roles from
      *             <code>ipRangeNode</code>.
