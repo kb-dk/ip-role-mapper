@@ -45,7 +45,7 @@ public class IPRangeTest {
     private final InetAddress testEndAddress;
     private final List<String> testRoles;
 
-    private final IPRange testIPRange;
+    private final IPRangeRoles testIPRange;
 
     /**
      * @throws UnknownHostException
@@ -56,12 +56,12 @@ public class IPRangeTest {
         testBeginAddress = InetAddress.getByName("192.168.0.1");
         testEndAddress = InetAddress.getByName("192.168.0.254");
         testRoles = Arrays.asList(new String[] { "public" });
-        testIPRange = new IPRange(testBeginAddress, testEndAddress, testRoles);
+        testIPRange = new IPRangeRoles(testBeginAddress, testEndAddress, testRoles);
     }
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange#IPRange(java.net.InetAddress, java.net.InetAddress, java.util.List)}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles#IPRange(java.net.InetAddress, java.net.InetAddress, java.util.List)}
      * .
      * 
      * @throws UnknownHostException
@@ -80,7 +80,7 @@ public class IPRangeTest {
             final List<String> roles = Arrays.asList(new String[] { "public" });
 
             // Verify that the constructor coughs up blood....
-            new IPRange(beginAddress, endAddress, roles);
+            new IPRangeRoles(beginAddress, endAddress, roles);
 
             fail("Expected an IllegalArgumentException to be thrown.");
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -90,7 +90,7 @@ public class IPRangeTest {
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange#IPRange(java.net.InetAddress, java.net.InetAddress, java.util.List)}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles#IPRange(java.net.InetAddress, java.net.InetAddress, java.util.List)}
      * .
      * 
      * @throws UnknownHostException
@@ -111,7 +111,7 @@ public class IPRangeTest {
         try {
 
             // Verify that the constructor coughs up blood....
-            new IPRange(ipV4Address, ipV6Address, roles);
+            new IPRangeRoles(ipV4Address, ipV6Address, roles);
 
             fail("Expected an IllegalArgumentException to be thrown.");
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -121,7 +121,7 @@ public class IPRangeTest {
         // Now check the other way around...
         try {
             // Verify that the constructor coughs up blood....
-            new IPRange(ipV6Address, ipV4Address, roles);
+            new IPRangeRoles(ipV6Address, ipV4Address, roles);
 
             fail("Expected an IllegalArgumentException to be thrown.");
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -131,7 +131,7 @@ public class IPRangeTest {
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange#getBeginAddress()}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles#getBeginAddress()}
      * .
      * 
      * @throws UnknownHostException
@@ -143,7 +143,7 @@ public class IPRangeTest {
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange#getEndAddress()}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles#getEndAddress()}
      * .
      */
     @Test
@@ -153,7 +153,7 @@ public class IPRangeTest {
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange#getRoles()}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles#getRoles()}
      * .
      */
     @Test

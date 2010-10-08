@@ -27,13 +27,11 @@
 package dk.statsbiblioteket.doms.iprolemapper.utils;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.LinkedList;
@@ -47,7 +45,7 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
+import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.util.xml.DOM;
 
 /**
@@ -68,10 +66,14 @@ public class EZProxyConfigConverter {
      * @throws ParseException
      *             if any errors are encountered while parsing the EZProxy
      *             configuration.
-     * @throws ParserConfigurationException if creation of the document builder for building the <code>IPRangeMapperService</code> configuration failed. 
-     * @throws TransformerException if transformation to a garbage truck failed.
+     * @throws ParserConfigurationException
+     *             if creation of the document builder for building the
+     *             <code>IPRangeMapperService</code> configuration failed.
+     * @throws TransformerException
+     *             if transformation to a garbage truck failed.
      */
-    public static void main(String[] args) throws IOException, ParseException, ParserConfigurationException, TransformerException {
+    public static void main(String[] args) throws IOException, ParseException,
+            ParserConfigurationException, TransformerException {
         if (args.length != 2) {
             System.out.println("Usage: "
                     + EZProxyConfigConverter.class.getSimpleName()
@@ -94,7 +96,7 @@ public class EZProxyConfigConverter {
         ezTokenizer.wordChars(',', ',');
 
         int ttype = ezTokenizer.nextToken();
-        List<IPRange> ipRanges = new LinkedList<IPRange>();
+        List<IPRangeRoles> ipRanges = new LinkedList<IPRangeRoles>();
         List<String> roles = new LinkedList<String>();
         while (ttype != StreamTokenizer.TT_EOF) {
             switch (ttype) {
@@ -127,31 +129,40 @@ public class EZProxyConfigConverter {
 
             ttype = ezTokenizer.nextToken();
         }
-        
-        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+
+        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+                .newInstance();
+        final DocumentBuilder documentBuilder = documentBuilderFactory
+                .newDocumentBuilder();
         final Document ipRangeMapperConfig = documentBuilder.newDocument();
-        
-        final Element ipRangesElement = ipRangeMapperConfig.createElement("ipranges");
+
+        final Element ipRangesElement = ipRangeMapperConfig
+                .createElement("ipranges");
         ipRangeMapperConfig.appendChild(ipRangesElement);
-        
-        // Create an <iprange> element for each IPRange object. 
-        for (IPRange ipRange : ipRanges) {
-            final Element ipRangeElement = ipRangeMapperConfig.createElement("iprange");
+
+        // Create an <iprange> element for each IPRange object.
+        for (IPRangeRoles ipRange : ipRanges) {
+            final Element ipRangeElement = ipRangeMapperConfig
+                    .createElement("iprange");
             ipRangesElement.appendChild(ipRangeElement);
-            ipRangeElement.setAttribute("begin", ipRange.getBeginAddress().getHostAddress());
-            ipRangeElement.setAttribute("end", ipRange.getEndAddress().getHostAddress());
-            
+            ipRangeElement.setAttribute("begin", ipRange.getBeginAddress()
+                    .getHostAddress());
+            ipRangeElement.setAttribute("end", ipRange.getEndAddress()
+                    .getHostAddress());
+
             // Add role child nodes.
             for (String roleName : ipRange.getRoles()) {
-                final Element roleElement = ipRangeMapperConfig.createElement("role");
+                final Element roleElement = ipRangeMapperConfig
+                        .createElement("role");
                 ipRangeElement.appendChild(roleElement);
                 roleElement.setTextContent(roleName);
             }
         }
-        
-        final DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(args[1]));
-        dataOutputStream.write(DOM.domToString(ipRangeMapperConfig,true).getBytes());
+
+        final DataOutputStream dataOutputStream = new DataOutputStream(
+                new FileOutputStream(args[1]));
+        dataOutputStream.write(DOM.domToString(ipRangeMapperConfig, true)
+                .getBytes());
     }
 
     /**
@@ -170,7 +181,7 @@ public class EZProxyConfigConverter {
      * @throws ParseException
      *             if an un-expected token is encountered.
      */
-    private static IPRange readIPRange(StreamTokenizer ezTokenizer,
+    private static IPRangeRoles readIPRange(StreamTokenizer ezTokenizer,
             List<String> roles) throws IOException, ParseException {
 
         final String beginIP = readWord(ezTokenizer);
@@ -191,7 +202,7 @@ public class EZProxyConfigConverter {
         } // else: it is not an actual range, thus the end address will be the
         // same as the begin address.
 
-        return new IPRange(InetAddress.getByName(beginIP), InetAddress
+        return new IPRangeRoles(InetAddress.getByName(beginIP), InetAddress
                 .getByName(endIP), roles);
     }
 

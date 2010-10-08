@@ -28,6 +28,7 @@ package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
 import java.net.InetAddress;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,13 @@ public class IPRoleMapper {
      * A map for mapping an IP range start address to a list of all IP ranges
      * starting at that particular address.
      */
-    private static TreeMap<InetAddress, LinkedList<IPRange>> startAddrRangeMapList;
+    private static TreeMap<InetAddress, LinkedList<IPRangeRoles>> startAddrRangeMapList;
+
+    /**
+     * A map for mapping all known role names with the ranges associated with
+     * them.
+     */
+    private static TreeMap<String, LinkedList<IPRange>> roleIPRangeMapList;
 
     /**
      * Map a host name or IP address to one or more roles all roles of the known
@@ -63,7 +70,7 @@ public class IPRoleMapper {
 
         final Set<String> collectedRoles = new TreeSet<String>();
 
-        Collection<LinkedList<IPRange>> allPotentialMatchingRangeSets;
+        Collection<LinkedList<IPRangeRoles>> allPotentialMatchingRangeSets;
 
         // Synchronise with the static init() method.
         synchronized (IPRoleMapper.class) {
@@ -73,9 +80,9 @@ public class IPRoleMapper {
         }
 
         final InetAddressComparator ipComparator = new InetAddressComparator();
-        for (List<IPRange> potentialMatchingRanges : allPotentialMatchingRangeSets) {
+        for (List<IPRangeRoles> potentialMatchingRanges : allPotentialMatchingRangeSets) {
 
-            for (IPRange candidateRange : potentialMatchingRanges) {
+            for (IPRangeRoles candidateRange : potentialMatchingRanges) {
 
                 // Test ipAddress lies within the candidate range.
                 if ((ipComparator.compare(ipAddress, candidateRange
@@ -95,6 +102,26 @@ public class IPRoleMapper {
         return collectedRoles;
     }
 
+    
+    /**
+     * Get a set of address ranges associated with the role names specified by
+     * <code>roles</code>.
+     * 
+     * @param roles a set of role names to find associated address ranges for.
+     * @return all the <code>IPRange</code> instances associated with the roles.
+     */
+    public Set<IPRange> mapRoles(Set<String> roles) {
+
+        // Collect all the ranges associated with the roles specified. Use a set
+        // to eliminate duplicate IPRange objects.
+        final Set<IPRange> associatedRanges = new HashSet<IPRange>();
+        for (String role : roles) {
+            associatedRanges.addAll(roleIPRangeMapList.get(role));
+        }
+        return associatedRanges;
+    }
+
+    
     /**
      * (re-)initialise the internal database over IP ranges and roles. This
      * method should only be called for the initial initialisation and if the
@@ -104,22 +131,42 @@ public class IPRoleMapper {
      *            a list of IP range and role information to initialise the
      *            database with.
      */
-    public static synchronized void init(List<IPRange> ranges) {
+    public static synchronized void init(List<IPRangeRoles> ranges) {
 
-        startAddrRangeMapList = new TreeMap<InetAddress, LinkedList<IPRange>>(
+        startAddrRangeMapList = new TreeMap<InetAddress, LinkedList<IPRangeRoles>>(
                 new InetAddressComparator());
 
-        for (IPRange range : ranges) {
-            LinkedList<IPRange> rangeList = startAddrRangeMapList.get(range
-                    .getBeginAddress());
+        roleIPRangeMapList = new TreeMap<String, LinkedList<IPRange>>();
+
+        for (IPRangeRoles range : ranges) {
+
+            // Add the range to the start IP address -> IPRangeRoles map.
+            LinkedList<IPRangeRoles> rangeList = startAddrRangeMapList
+                    .get(range.getBeginAddress());
 
             if (rangeList == null) {
                 // No ranges with this begin address have been registered
                 // earlier. Create a container for them.
-                rangeList = new LinkedList<IPRange>();
+                rangeList = new LinkedList<IPRangeRoles>();
                 startAddrRangeMapList.put(range.getBeginAddress(), rangeList);
             }
             rangeList.add(range);
+
+            // Associate the range with all its roles in the role -> IPRange
+            // map.
+            for (String roleName : range.getRoles()) {
+
+                LinkedList<IPRange> roleRanges = roleIPRangeMapList
+                        .get(roleName);
+
+                if (roleRanges == null) {
+                    // There has not previously been associated any ranges with
+                    // this role name. Create a new list.
+                    roleRanges = new LinkedList<IPRange>();
+                    roleIPRangeMapList.put(roleName, roleRanges);
+                }
+                roleRanges.add(range);
+            }
         }// end-for
     }
 }

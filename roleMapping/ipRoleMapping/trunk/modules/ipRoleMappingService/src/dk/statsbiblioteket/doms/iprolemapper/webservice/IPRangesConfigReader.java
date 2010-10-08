@@ -47,7 +47,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
+import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 
 /**
  * This class is a factory class meant for production of lists of
@@ -80,7 +80,7 @@ public class IPRangesConfigReader {
      *             if any errors are encountered while parsing the configuration
      *             file.
      */
-    public List<IPRange> readFromXMLConfigFile(File rangesConfigFile)
+    public List<IPRangeRoles> readFromXMLConfigFile(File rangesConfigFile)
             throws ParserConfigurationException, SAXException, IOException,
             XPathExpressionException {
 
@@ -100,7 +100,7 @@ public class IPRangesConfigReader {
                 "/ipranges/iprange", configuationDocument,
                 XPathConstants.NODESET);
 
-        final List<IPRange> ipRangeList = new LinkedList<IPRange>();
+        final List<IPRangeRoles> ipRangeList = new LinkedList<IPRangeRoles>();
         for (int nodeIdx = 0; nodeIdx < ipRangeNodes.getLength(); nodeIdx++) {
             ipRangeList.add(produceIPRangeInstance(ipRangeNodes.item(nodeIdx)));
         }
@@ -122,7 +122,7 @@ public class IPRangesConfigReader {
      *             either an unknown host name or illegal IP address.
      * @throws IllegalArgumentException
      */
-    private IPRange produceIPRangeInstance(Node ipRangeNode)
+    private IPRangeRoles produceIPRangeInstance(Node ipRangeNode)
             throws XPathExpressionException, IllegalArgumentException,
             UnknownHostException {
 
@@ -143,7 +143,7 @@ public class IPRangesConfigReader {
                     .trim());
         }
 
-        return new IPRange(InetAddress.getByName(beginAddress), InetAddress
+        return new IPRangeRoles(InetAddress.getByName(beginAddress), InetAddress
                 .getByName(endAddress), ipRangeRoles);
     }
 }

@@ -34,11 +34,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -47,7 +49,9 @@ import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
+import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
+import dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator;
 import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 
 //import dk.statsbiblioteket.doms.webservices.ConfigCollection;
@@ -107,6 +111,53 @@ public class IPRoleMapperService {
         return rolesString;
     }
 
+    // TODO: Throw WebApplicationException instead of the current ones.
+
+    @GET
+    @Path("getRanges")
+    @Produces("text/plain")
+    public String getRanges(@QueryParam("role") List<String> roles)
+            throws XPathExpressionException, ParserConfigurationException,
+            SAXException, IOException, URISyntaxException {
+
+        log.trace("IPRoleMapperService.getRanges(): Called with roles: '"
+                + roles + "'");
+
+        verifyConfiguration();
+        final IPRoleMapper ipRoleMapper = new IPRoleMapper();
+        final Set<IPRange> mappedRanges = ipRoleMapper
+                .mapRoles(new TreeSet<String>(roles));
+
+        // Build the result string.
+        String rangesString = "";
+        final Iterator<IPRange> rangesIterator = mappedRanges.iterator();
+        while (rangesIterator.hasNext()) {
+
+            final IPRange range = rangesIterator.next();
+            final InetAddress beginAddress = range.getBeginAddress();
+            final InetAddress endAddress = range.getEndAddress();
+
+            final InetAddressComparator addressComparator = new InetAddressComparator();
+            if (addressComparator.compare(beginAddress, endAddress) == 0) {
+                // It's a single host...
+                rangesString += beginAddress.getHostAddress();
+            } else {
+                // It's an actual range...
+                rangesString += beginAddress.getHostAddress() + "-"
+                        + endAddress.getHostAddress();
+            }
+
+            // Append a comma if there are more roles left.
+            if (rangesIterator.hasNext()) {
+                rangesString += "\n";
+            }
+        }// end-while
+
+        log.trace("IPRoleMapperService.getRanges(): returning ranges: '"
+                + rangesString + "' for roles: " + roles);
+        return rangesString;
+    }
+
     /**
      * Check whether the IP ranges configuration has changed since last
      * initialisation, and if so, then re-initialise IPRoleMapper.
@@ -158,7 +209,7 @@ public class IPRoleMapperService {
             log.info("IP ranges configuration has changed. Re-initialising.");
             // The configuration has changed. Re-initialise.
             final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
-            final List<IPRange> ranges = rangesReader
+            final List<IPRangeRoles> ranges = rangesReader
                     .readFromXMLConfigFile(rangesConfigFile);
             IPRoleMapper.init(ranges);
         }
