@@ -27,61 +27,43 @@
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
 import java.net.InetAddress;
+import java.util.List;
 
 /**
  *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
- * 
  */
-public class IPRange {
+public class IPRangeRoles extends IPRange {
 
-    private final InetAddress beginAddress;
-    private final InetAddress endAddress;
+    private final List<String> roles;
 
     /**
      * Create an IP range starting at <code>beginAddress</code> and ending at
-     * <code>endAddress</code>. Both addresses are included in the range.
+     * <code>endAddress</code>. Both addresses are included in the range. <\p>
+     * The IP range is associated with the roles specified by <code>roles</code>
      * 
      * @param beginAddress
      *            the start address of the range.
      * @param endAddress
      *            the end address of the range.
+     * @param roles
+     *            the roles associated with the range.
      * @throws IllegalArgumentException
      *             if the begin address and end address is not of the same type.
      *             I.e. if they are not both IPv4 of IPv6 addresses, or if
      *             <code>beginAddress</code> is larger/higher/after
      *             <code>endAddress</code>.
      */
-    public IPRange(InetAddress beginAddress, InetAddress endAddress) {
-        if (beginAddress.getClass() != endAddress.getClass()) {
-            throw new IllegalArgumentException("The begin and end addresses "
-                    + "must be of the same type. beginAddress.getClas() = "
-                    + beginAddress.getClass() + "  endAddress.getClass() = "
-                    + endAddress.getClass());
-        }
-
-        final InetAddressComparator comparator = new InetAddressComparator();
-        if (comparator.compare(beginAddress, endAddress) == 1) {
-            throw new IllegalArgumentException("The begin addresses must be "
-                    + "equal to or before the end address. beginAddress = "
-                    + beginAddress + "  endAddress = " + endAddress);
-        }
-
-        this.beginAddress = beginAddress;
-        this.endAddress = endAddress;
+    public IPRangeRoles(InetAddress beginAddress, InetAddress endAddress,
+            List<String> roles) throws IllegalArgumentException {
+        super(beginAddress, endAddress);
+        this.roles = roles;
     }
 
     /**
-     * @return the begin address of this IP range.
+     * @return the roles associated with this IP range.
      */
-    public InetAddress getBeginAddress() {
-        return beginAddress;
-    }
-
-    /**
-     * @return the end address of this IP range.
-     */
-    public InetAddress getEndAddress() {
-        return endAddress;
+    public List<String> getRoles() {
+        return roles;
     }
 
     /* (non-Javadoc)
@@ -90,11 +72,8 @@ public class IPRange {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((beginAddress == null) ? 0 : beginAddress.hashCode());
-        result = prime * result
-                + ((endAddress == null) ? 0 : endAddress.hashCode());
+        int result = super.hashCode();
+        result = prime * result + ((roles == null) ? 0 : roles.hashCode());
         return result;
     }
 
@@ -106,25 +85,18 @@ public class IPRange {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!(obj instanceof IPRange)) {
+        if (!(obj instanceof IPRangeRoles)) {
             return false;
         }
-        IPRange other = (IPRange) obj;
-        if (beginAddress == null) {
-            if (other.beginAddress != null) {
+        IPRangeRoles other = (IPRangeRoles) obj;
+        if (roles == null) {
+            if (other.roles != null) {
                 return false;
             }
-        } else if (!beginAddress.equals(other.beginAddress)) {
-            return false;
-        }
-        if (endAddress == null) {
-            if (other.endAddress != null) {
-                return false;
-            }
-        } else if (!endAddress.equals(other.endAddress)) {
+        } else if (!roles.equals(other.roles)) {
             return false;
         }
         return true;

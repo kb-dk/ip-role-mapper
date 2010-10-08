@@ -38,7 +38,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
+import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 
 /**
  * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
@@ -57,14 +57,17 @@ public class IPRangesConfigReaderTest {
      */
     @Test
     public void testReadFromXMLConfigFile() throws XPathExpressionException,
-	    ParserConfigurationException, SAXException, IOException {
+            ParserConfigurationException, SAXException, IOException {
 
-	// See if we survive reading Mads' insane configuration.
-	IPRangesConfigReader configReader = new IPRangesConfigReader();
-	List<IPRange> ipRanges = configReader.readFromXMLConfigFile(new File(
-	        "modules/ipRoleMappingService/config/madstest.xml"));
-	assertEquals(
-	        "Un-expected number of IPRange instances were produced from the configuration file.",
-	        981, ipRanges.size());
+        // See if we survive reading Mads' insane configuration.
+        IPRangesConfigReader configReader = new IPRangesConfigReader();
+        // FIXME! Find a more flexible way to locate the file. The file cannot
+        // be found on some systems depending on the configuration of the
+        // project root.
+        List<IPRangeRoles> ipRanges = configReader
+                .readFromXMLConfigFile(new File("config/madstest.xml"));
+        assertEquals(
+                "Un-expected number of IPRange instances were produced from the configuration file.",
+                981, ipRanges.size());
     }
 }

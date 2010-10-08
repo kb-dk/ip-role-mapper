@@ -100,7 +100,7 @@ public class IPRoleMapperTest {
         assertEquals(expectedRoles, associatedRoles);
     }
 
-    private List<IPRange> createIPv4TestRanges() throws UnknownHostException {
+    private List<IPRangeRoles> createIPv4TestRanges() throws UnknownHostException {
 
         // Note: It is important that the sub-arrays in rangeSetups contain a
         // begin address, an end address and at least one role!
@@ -109,7 +109,7 @@ public class IPRoleMapperTest {
                 { "192.168.0.123", "192.168.0.151", "student" },
                 { "192.168.0.142", "192.168.0.162", "professor" } };
 
-        final List<IPRange> ipRanges = new LinkedList<IPRange>();
+        final List<IPRangeRoles> ipRanges = new LinkedList<IPRangeRoles>();
         for (String[] rangeSetup : rangeSetups) {
 
             final InetAddress beginAddress = InetAddress
@@ -119,7 +119,7 @@ public class IPRoleMapperTest {
             final List<String> roles = Arrays.asList(Arrays.copyOfRange(
                     rangeSetup, 2, rangeSetup.length));
 
-            final IPRange testRange = new IPRange(beginAddress, endAddress,
+            final IPRangeRoles testRange = new IPRangeRoles(beginAddress, endAddress,
                     roles);
 
             ipRanges.add(testRange);
