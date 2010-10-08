@@ -59,13 +59,18 @@ public class IPRoleMapper {
      * @return a <code>String</code> containing a comma separated list of all
      *         matching roles.
      */
-    public synchronized Set<String> mapIPHost(InetAddress ipAddress) {
+    public Set<String> mapIPHost(InetAddress ipAddress) {
 
         final Set<String> collectedRoles = new TreeSet<String>();
 
-        // Get all ranges starting before or at the given ipAddress.
-        final Collection<LinkedList<IPRange>> allPotentialMatchingRangeSets = startAddrRangeMapList
-                .headMap(ipAddress, true).values();
+        Collection<LinkedList<IPRange>> allPotentialMatchingRangeSets;
+
+        // Synchronise with the static init() method.
+        synchronized (IPRoleMapper.class) {
+            // Get all ranges starting before or at the given ipAddress.
+            allPotentialMatchingRangeSets = startAddrRangeMapList.headMap(
+                    ipAddress, true).values();
+        }
 
         final InetAddressComparator ipComparator = new InetAddressComparator();
         for (List<IPRange> potentialMatchingRanges : allPotentialMatchingRangeSets) {
