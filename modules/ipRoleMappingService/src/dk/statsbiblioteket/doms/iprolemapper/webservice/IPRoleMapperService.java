@@ -41,6 +41,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -86,6 +87,7 @@ public class IPRoleMapperService {
     public String getRoles(@PathParam("ipaddress") String ipAddress)
             throws XPathExpressionException, ParserConfigurationException,
             SAXException, IOException, URISyntaxException {
+
         log.trace("IPRoleMapperService.getRoles(): Called with IP adress: '"
                 + ipAddress + "'");
 
