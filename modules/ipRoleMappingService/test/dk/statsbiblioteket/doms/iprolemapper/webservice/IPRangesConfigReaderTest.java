@@ -63,7 +63,8 @@ public class IPRangesConfigReaderTest {
         IPRangesConfigReader configReader = new IPRangesConfigReader();
         // FIXME! Find a more flexible way to locate the file. The file cannot
         // be found on some systems depending on the configuration of the
-        // project root.
+        // project root. Maybe the ResourceLocator from the PLANETS source could
+        // be useful.
         List<IPRangeRoles> ipRanges = configReader
                 .readFromXMLConfigFile(new File("config/madstest.xml"));
         assertEquals(
