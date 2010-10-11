@@ -195,7 +195,8 @@ public class IPRoleMapperService {
         }
 
         // FIXME! I'm not quite sure that this is the best way to locate the
-        // configuration file.
+        // configuration file. Maybe the ResourceLocator from the PLANETS source
+        // could be useful.
         final File rangesConfigFile = new File(ConfigCollection
                 .getServletContext().getRealPath(rangesConfigFileName));
 
