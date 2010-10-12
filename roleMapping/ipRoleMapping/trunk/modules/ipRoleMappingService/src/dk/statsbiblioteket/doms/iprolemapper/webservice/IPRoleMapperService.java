@@ -41,7 +41,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -54,6 +53,7 @@ import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator;
 import dk.statsbiblioteket.doms.webservices.ConfigCollection;
+import dk.statsbiblioteket.util.Logs;
 
 //import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 //
@@ -74,11 +74,7 @@ public class IPRoleMapperService {
     // @Context
     // private HttpServletRequest request;
 
-    /**
-     * 
-     */
     public IPRoleMapperService() {
-
     }
 
     @GET
@@ -88,8 +84,9 @@ public class IPRoleMapperService {
             throws XPathExpressionException, ParserConfigurationException,
             SAXException, IOException, URISyntaxException {
 
-        log.trace("IPRoleMapperService.getRoles(): Called with IP adress: '"
-                + ipAddress + "'");
+        Logs.log(log, Logs.Level.TRACE,
+                "IPRoleMapperService.getRoles(): Called with IP adress: ",
+                ipAddress);
 
         verifyConfiguration();
         final IPRoleMapper ipRoleMapper = new IPRoleMapper();
@@ -108,12 +105,11 @@ public class IPRoleMapperService {
             }
         }// end-while
 
-        log.trace("IPRoleMapperService.getRoles(): returning roles: '"
-                + rolesString + "' for IP address: " + ipAddress);
+        Logs.log(log, Logs.Level.TRACE,
+                "IPRoleMapperService.getRoles(): returning roles: ",
+                rolesString);
         return rolesString;
     }
-
-    // TODO: Throw WebApplicationException instead of the current ones.
 
     @GET
     @Path("getRanges")
@@ -122,9 +118,8 @@ public class IPRoleMapperService {
             throws XPathExpressionException, ParserConfigurationException,
             SAXException, IOException, URISyntaxException {
 
-        log.trace("IPRoleMapperService.getRanges(): Called with roles: '"
-                + roles + "'");
-
+        Logs.log(log, Logs.Level.TRACE,
+                "IPRoleMapperService.getRanges(): Called with roles: ", roles);
         verifyConfiguration();
         final IPRoleMapper ipRoleMapper = new IPRoleMapper();
         final Set<IPRange> mappedRanges = ipRoleMapper
@@ -155,8 +150,9 @@ public class IPRoleMapperService {
             }
         }// end-while
 
-        log.trace("IPRoleMapperService.getRanges(): returning ranges: '"
-                + rangesString + "' for roles: " + roles);
+        Logs.log(log, Logs.Level.TRACE,
+                "IPRoleMapperService.getRanges(): returning ranges: ",
+                rangesString);
         return rangesString;
     }
 

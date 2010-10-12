@@ -54,8 +54,8 @@ public class ServiceExceptionMapper implements ExceptionMapper<Exception> {
             
             // Complain about an invalid host address.
             return Response.status(ClientResponse.Status.BAD_REQUEST).entity(
-                    "Could not lookup roles for the requested host: "
-                            + exception.getMessage()).build();
+                    "Could not lookup roles for the requested host. Reason: "
+                            + exception.toString()).build();
         } else if (exception instanceof XPathExpressionException
                 || exception instanceof IOException
                 || exception instanceof SAXException) {
@@ -64,7 +64,7 @@ public class ServiceExceptionMapper implements ExceptionMapper<Exception> {
             return Response.status(ClientResponse.Status.INTERNAL_SERVER_ERROR)
                     .entity(
                             "Service configuration error: "
-                                    + exception.getMessage()).build();
+                                    + exception.toString()).build();
         } else {
             
             // Any un-expected exception also leads to a server error.
@@ -72,7 +72,7 @@ public class ServiceExceptionMapper implements ExceptionMapper<Exception> {
                     "The service could not process the request due to an"
                             + " error. Please consult the server log. The "
                             + "cause to the failure was: "
-                            + exception.getMessage()).build();
+                            + exception.toString()).build();
         }
     }
 }
