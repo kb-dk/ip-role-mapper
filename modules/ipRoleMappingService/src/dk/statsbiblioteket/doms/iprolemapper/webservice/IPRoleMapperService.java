@@ -178,6 +178,9 @@ public class IPRoleMapperService {
     private void verifyConfiguration() throws XPathExpressionException,
             ParserConfigurationException, SAXException, IOException,
             URISyntaxException {
+
+        Logs.log(log, Logs.Level.TRACE, "verifyConfiguration(): Entering.");
+
         // NOTE! Make sure that web.xml has a listener entry for the
         // ConfigContextListener otherwise this will go very, very wrong.
 
@@ -185,6 +188,10 @@ public class IPRoleMapperService {
 
         final String rangesConfigFileName = (String) configuration
                 .get("ipRangeAndRoleConfigurationFile");
+
+        Logs.log(log, Logs.Level.TRACE, "IPRoleMapperService(): "
+                + "About to load a configuration file at this location: ",
+                rangesConfigFileName);
 
         if (rangesConfigFileName == null || rangesConfigFileName.length() == 0) {
             throw new IllegalArgumentException("Bad file name for the IP "
@@ -205,12 +212,16 @@ public class IPRoleMapperService {
             latestConfigFileModificationTime = rangesConfigFile.lastModified();
             lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
 
-            log.info("IP ranges configuration has changed. Re-initialising.");
+            Logs.log(log, Logs.Level.INFO, "IP ranges configuration has "
+                    + "changed. Re-initialising from file: ",
+                    lastConfigurationFilePath);
             // The configuration has changed. Re-initialise.
             final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
             final List<IPRangeRoles> ranges = rangesReader
                     .readFromXMLConfigFile(rangesConfigFile);
             IPRoleMapper.init(ranges);
         }
+
+        Logs.log(log, Logs.Level.TRACE, "verifyConfiguration(): Exiting.");
     }
 }
