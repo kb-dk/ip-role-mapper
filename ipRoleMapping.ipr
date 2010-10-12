@@ -246,6 +246,37 @@
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
   <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://doms.svn.sourceforge.net/svnroot/doms/roleMapping/ipRoleMapping/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://doms.svn.sourceforge.net/svnroot/doms/roleMapping/ipRoleMapping/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://doms.svn.sourceforge.net/svnroot/doms/roleMapping/ipRoleMapping/branches" />
+                  <option value="https://doms.svn.sourceforge.net/svnroot/doms/roleMapping/ipRoleMapping/tags" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://doms.svn.sourceforge.net/svnroot/doms/roleMapping/ipRoleMapping/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
@@ -284,6 +315,15 @@
       <JAVADOC />
       <SOURCES>
         <root url="jar://$PROJECT_DIR$/lib/servlet-api-2.5-apache-tomcat-6.0.20/src/servlet-api-2.5-apache-tomcat-6.0.20-src.zip!/" />
+      </SOURCES>
+    </library>
+    <library name="sbutil">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/sbutils-0.5.1/jars/sbutil-0.5.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/lib/sbutils-0.5.1/src/sbutil-0.5.1-src.zip!/sbutil-0.5.1/src" />
       </SOURCES>
     </library>
   </component>
