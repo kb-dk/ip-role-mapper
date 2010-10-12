@@ -15,16 +15,10 @@
 	<iprange begin="80.198.227.206" end="80.198.227.206">
 		<role>csa</role>
 	</iprange>
-	<iprange begin="212.130.131.9" end="212.130.131.9">
+	<iprange begin="212.130.131.9" end="212.130.131.10">
 		<role>csa</role>
 	</iprange>
-	<iprange begin="212.130.131.10" end="212.130.131.10">
-		<role>csa</role>
-	</iprange>
-	<iprange begin="212.130.131.8" end="212.130.131.8">
-		<role>csa</role>
-	</iprange>
-	<iprange begin="212.130.131.9" end="212.130.131.9">
+	<iprange begin="212.130.131.8" end="212.130.131.9">
 		<role>csa</role>
 	</iprange>
 	<iprange begin="212.130.131.11" end="212.130.131.11">
@@ -48,16 +42,10 @@
 	<iprange begin="131.165.177.76" end="131.165.177.76">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="130.227.16.15" end="130.227.16.15">
+	<iprange begin="130.227.16.15" end="130.227.16.16">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="130.227.16.16" end="130.227.16.16">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="212.130.12.36" end="212.130.12.36">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="212.130.12.37" end="212.130.12.37">
+	<iprange begin="212.130.12.36" end="212.130.12.37">
 		<role>digitaleaarboeger</role>
 	</iprange>
 	<iprange begin="195.215.130.194" end="195.215.130.194">
@@ -75,10 +63,7 @@
 	<iprange begin="80.198.230.222" end="80.198.230.222">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="80.161.198.218" end="80.161.198.218">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="80.161.198.219" end="80.161.198.219">
+	<iprange begin="80.161.198.218" end="80.161.198.219">
 		<role>digitaleaarboeger</role>
 	</iprange>
 	<iprange begin="131.165.167.85" end="131.165.167.85">
@@ -99,10 +84,7 @@
 	<iprange begin="83.88.230.124" end="83.88.230.124">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="83.88.230.114" end="83.88.230.114">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="83.88.230.115" end="83.88.230.115">
+	<iprange begin="83.88.230.114" end="83.88.230.115">
 		<role>digitaleaarboeger</role>
 	</iprange>
 	<iprange begin="80.161.233.178" end="80.161.233.178">
@@ -129,10 +111,7 @@
 	<iprange begin="131.165.85.2" end="131.165.85.2">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="131.165.85.109" end="131.165.85.109">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="131.165.85.110" end="131.165.85.110">
+	<iprange begin="131.165.85.109" end="131.165.85.110">
 		<role>digitaleaarboeger</role>
 	</iprange>
 	<iprange begin="80.198.226.22" end="80.198.226.22">
@@ -156,16 +135,10 @@
 	<iprange begin="195.249.249.170" end="195.249.249.170">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="87.48.148.33" end="87.48.148.33">
+	<iprange begin="87.48.148.33" end="87.48.148.34">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="87.48.148.34" end="87.48.148.34">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="194.182.130.219" end="194.182.130.219">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="194.182.130.218" end="194.182.130.218">
+	<iprange begin="194.182.130.218" end="194.182.130.219">
 		<role>digitaleaarboeger</role>
 	</iprange>
 	<iprange begin="87.48.138.107" end="87.48.138.107">
@@ -201,22 +174,7 @@
 	<iprange begin="83.90.252.2" end="83.90.252.2">
 		<role>digitaleaarboeger</role>
 	</iprange>
-	<iprange begin="83.90.50.193" end="83.90.50.193">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="83.90.50.194" end="83.90.50.194">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="83.90.50.195" end="83.90.50.195">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="83.90.50.196" end="83.90.50.196">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="83.90.50.197" end="83.90.50.197">
-		<role>digitaleaarboeger</role>
-	</iprange>
-	<iprange begin="83.90.50.198" end="83.90.50.198">
+	<iprange begin="83.90.50.193" end="83.90.50.198">
 		<role>digitaleaarboeger</role>
 	</iprange>
 	<iprange begin="80.162.172.218" end="80.162.172.218">
