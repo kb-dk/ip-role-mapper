@@ -26,7 +26,7 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +69,6 @@ public class IPRangesConfigReaderTest {
                 .readFromXMLConfigFile(new File("config/madstest.xml"));
         assertEquals(
                 "Un-expected number of IPRange instances were produced from the configuration file.",
-                981, ipRanges.size());
+                967, ipRanges.size());
     }
 }

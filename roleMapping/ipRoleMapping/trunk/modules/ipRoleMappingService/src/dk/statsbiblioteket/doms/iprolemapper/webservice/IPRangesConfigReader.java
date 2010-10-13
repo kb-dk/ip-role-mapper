@@ -36,11 +36,14 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -48,6 +51,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
+import dk.statsbiblioteket.util.Logs;
+import dk.statsbiblioteket.util.xml.DOM;
 
 /**
  * This class is a factory class meant for production of lists of
@@ -56,6 +61,9 @@ import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
  * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
  */
 public class IPRangesConfigReader {
+
+    private static final Log log = LogFactory
+            .getLog(IPRangesConfigReader.class);
 
     /**
      * Produce a <code>List</code> of <code>IPRange</code> instances constructed
@@ -84,6 +92,10 @@ public class IPRangesConfigReader {
             throws ParserConfigurationException, SAXException, IOException,
             XPathExpressionException {
 
+        Logs.log(log, Logs.Level.TRACE,
+                "readFromXMLConfigFile(): Called with file path: ",
+                rangesConfigFile);
+
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
                 .newInstance();
 
@@ -104,6 +116,10 @@ public class IPRangesConfigReader {
         for (int nodeIdx = 0; nodeIdx < ipRangeNodes.getLength(); nodeIdx++) {
             ipRangeList.add(produceIPRangeInstance(ipRangeNodes.item(nodeIdx)));
         }
+
+        Logs.log(log, Logs.Level.TRACE,
+                "readFromXMLConfigFile(): Returning IP address ranges: ",
+                ipRangeList);
 
         return ipRangeList;
     }
@@ -126,7 +142,20 @@ public class IPRangesConfigReader {
             throws XPathExpressionException, IllegalArgumentException,
             UnknownHostException {
 
-        NamedNodeMap attributes = ipRangeNode.getAttributes();
+        if (log.isTraceEnabled()) {
+
+            String ipRangeNodeXMLString = "Malformed XML";
+            try {
+                ipRangeNodeXMLString = DOM.domToString(ipRangeNode);
+            } catch (TransformerException transformerException) {
+                // Just ignore for now and log. The code will break later...
+            }
+
+            log.trace("produceIPRangeInstance(): Called with XML node: "
+                    + ipRangeNodeXMLString);
+        }
+
+        final NamedNodeMap attributes = ipRangeNode.getAttributes();
         final String beginAddress = attributes.getNamedItem("begin")
                 .getNodeValue();
         final String endAddress = attributes.getNamedItem("end").getNodeValue();
@@ -143,7 +172,13 @@ public class IPRangesConfigReader {
                     .trim());
         }
 
-        return new IPRangeRoles(InetAddress.getByName(beginAddress), InetAddress
-                .getByName(endAddress), ipRangeRoles);
+        final IPRangeRoles rangeRoles = new IPRangeRoles(InetAddress
+                .getByName(beginAddress), InetAddress.getByName(endAddress),
+                ipRangeRoles);
+
+        Logs.log(log, Logs.Level.TRACE,
+                "produceIPRangeInstance(): Returning IPRangeRoles instance: ",
+                rangeRoles);
+        return rangeRoles;
     }
 }

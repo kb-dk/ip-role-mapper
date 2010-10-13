@@ -129,4 +129,12 @@ public class IPRange {
         }
         return true;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "IPRange: " + beginAddress + " - " + endAddress + "\n";
+    }
 }
