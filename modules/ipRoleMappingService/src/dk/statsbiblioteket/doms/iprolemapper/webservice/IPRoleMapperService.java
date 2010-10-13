@@ -77,83 +77,100 @@ public class IPRoleMapperService {
     public IPRoleMapperService() {
     }
 
+    /*
+     * Expected exceptions: XPathExpressionException,
+     *                      ParserConfigurationException,
+     *                      SAXException, IOException, URISyntaxException
+     */
     @GET
     @Path("getRoles/{ipaddress}")
     @Produces("text/plain")
     public String getRoles(@PathParam("ipaddress") String ipAddress)
-            throws XPathExpressionException, ParserConfigurationException,
-            SAXException, IOException, URISyntaxException {
+            throws Throwable {
 
-        Logs.log(log, Logs.Level.TRACE,
-                "IPRoleMapperService.getRoles(): Called with IP adress: ",
+        Logs.log(log, Logs.Level.TRACE, "getRoles(): Called with IP adress: ",
                 ipAddress);
 
-        verifyConfiguration();
-        final IPRoleMapper ipRoleMapper = new IPRoleMapper();
-        final Set<String> mappedRoles = ipRoleMapper.mapIPHost(InetAddress
-                .getByName(ipAddress));
+        try {
+            verifyConfiguration();
+            final IPRoleMapper ipRoleMapper = new IPRoleMapper();
+            final Set<String> mappedRoles = ipRoleMapper.mapIPHost(InetAddress
+                    .getByName(ipAddress));
 
-        // Build the result string.
-        String rolesString = "";
-        final Iterator<String> roleIterator = mappedRoles.iterator();
-        while (roleIterator.hasNext()) {
-            rolesString += roleIterator.next();
+            // Build the result string.
+            String rolesString = "";
+            final Iterator<String> roleIterator = mappedRoles.iterator();
+            while (roleIterator.hasNext()) {
+                rolesString += roleIterator.next();
 
-            // Append a comma if there are more roles left.
-            if (roleIterator.hasNext()) {
-                rolesString += ",";
-            }
-        }// end-while
+                // Append a comma if there are more roles left.
+                if (roleIterator.hasNext()) {
+                    rolesString += ",";
+                }
+            }// end-while
 
-        Logs.log(log, Logs.Level.TRACE,
-                "IPRoleMapperService.getRoles(): returning roles: ",
-                rolesString);
-        return rolesString;
+            Logs.log(log, Logs.Level.TRACE,
+                    "IPRoleMapperService.getRoles(): returning roles: ",
+                    rolesString);
+            return rolesString;
+        } catch (Throwable throwable) {
+            log.error("getRoles(): Caught un-expected exception.", throwable);
+            throw throwable;
+        }
     }
 
+    /*
+     * Expected exceptions: XPathExpressionException,
+     *                      ParserConfigurationException,
+     *                      SAXException, IOException, URISyntaxException
+     */
     @GET
     @Path("getRanges")
     @Produces("text/plain")
     public String getRanges(@QueryParam("role") List<String> roles)
-            throws XPathExpressionException, ParserConfigurationException,
-            SAXException, IOException, URISyntaxException {
+            throws Throwable {
 
-        Logs.log(log, Logs.Level.TRACE,
-                "IPRoleMapperService.getRanges(): Called with roles: ", roles);
-        verifyConfiguration();
-        final IPRoleMapper ipRoleMapper = new IPRoleMapper();
-        final Set<IPRange> mappedRanges = ipRoleMapper
-                .mapRoles(new TreeSet<String>(roles));
+        Logs.log(log, Logs.Level.TRACE, "getRanges(): Called with roles: ",
+                roles);
 
-        // Build the result string.
-        String rangesString = "";
-        final Iterator<IPRange> rangesIterator = mappedRanges.iterator();
-        while (rangesIterator.hasNext()) {
+        try {
+            verifyConfiguration();
+            final IPRoleMapper ipRoleMapper = new IPRoleMapper();
+            final Set<IPRange> mappedRanges = ipRoleMapper
+                    .mapRoles(new TreeSet<String>(roles));
 
-            final IPRange range = rangesIterator.next();
-            final InetAddress beginAddress = range.getBeginAddress();
-            final InetAddress endAddress = range.getEndAddress();
+            // Build the result string.
+            String rangesString = "";
+            final Iterator<IPRange> rangesIterator = mappedRanges.iterator();
+            while (rangesIterator.hasNext()) {
 
-            final InetAddressComparator addressComparator = new InetAddressComparator();
-            if (addressComparator.compare(beginAddress, endAddress) == 0) {
-                // It's a single host...
-                rangesString += beginAddress.getHostAddress();
-            } else {
-                // It's an actual range...
-                rangesString += beginAddress.getHostAddress() + "-"
-                        + endAddress.getHostAddress();
-            }
+                final IPRange range = rangesIterator.next();
+                final InetAddress beginAddress = range.getBeginAddress();
+                final InetAddress endAddress = range.getEndAddress();
 
-            // Append a comma if there are more roles left.
-            if (rangesIterator.hasNext()) {
-                rangesString += "\n";
-            }
-        }// end-while
+                final InetAddressComparator addressComparator = new InetAddressComparator();
+                if (addressComparator.compare(beginAddress, endAddress) == 0) {
+                    // It's a single host...
+                    rangesString += beginAddress.getHostAddress();
+                } else {
+                    // It's an actual range...
+                    rangesString += beginAddress.getHostAddress() + "-"
+                            + endAddress.getHostAddress();
+                }
 
-        Logs.log(log, Logs.Level.TRACE,
-                "IPRoleMapperService.getRanges(): returning ranges: ",
-                rangesString);
-        return rangesString;
+                // Append a comma if there are more roles left.
+                if (rangesIterator.hasNext()) {
+                    rangesString += "\n";
+                }
+            }// end-while
+
+            Logs.log(log, Logs.Level.TRACE, "getRanges(): returning ranges: ",
+                    rangesString);
+            return rangesString;
+        } catch (Throwable throwable) {
+            log.error("getRoles(): Caught un-expected exception.", throwable);
+            throw throwable;
+        }
     }
 
     /**
