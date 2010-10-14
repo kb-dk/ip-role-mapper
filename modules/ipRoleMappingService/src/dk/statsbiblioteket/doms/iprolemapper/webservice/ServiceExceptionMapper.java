@@ -32,9 +32,6 @@ import java.net.UnknownHostException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.xml.sax.SAXException;
 
 import com.sun.jersey.api.client.ClientResponse;
 
