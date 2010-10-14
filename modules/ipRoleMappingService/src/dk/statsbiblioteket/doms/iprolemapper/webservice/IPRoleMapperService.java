@@ -62,7 +62,7 @@ import dk.statsbiblioteket.util.Logs;
 //import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
- *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
+ * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
  */
 @Path("/")
 public class IPRoleMapperService {
@@ -78,9 +78,7 @@ public class IPRoleMapperService {
     }
 
     /*
-     * Expected exceptions: XPathExpressionException,
-     *                      ParserConfigurationException,
-     *                      SAXException, IOException, URISyntaxException
+     * Expected exception: UnknownHostException.
      */
     @GET
     @Path("getRoles/{ipaddress}")
@@ -119,11 +117,6 @@ public class IPRoleMapperService {
         }
     }
 
-    /*
-     * Expected exceptions: XPathExpressionException,
-     *                      ParserConfigurationException,
-     *                      SAXException, IOException, URISyntaxException
-     */
     @GET
     @Path("getRanges")
     @Produces("text/plain")
@@ -176,12 +169,11 @@ public class IPRoleMapperService {
     /**
      * Check whether the IP ranges configuration has changed since last
      * initialisation, and if so, then re-initialise IPRoleMapper.
-     * 
-     * @throws IOException
-     *             if any problems are encountered while reading the
-     *             configuration file.
+     * <p/>
+     * This method will not throw any exceptions if the initialisation fails,
+     * but will just keep the previous configuration.
      */
-    private void verifyConfiguration() throws IOException  {
+    private void verifyConfiguration() {
 
         Logs.log(log, Logs.Level.TRACE, "verifyConfiguration(): Entering.");
 
@@ -209,23 +201,30 @@ public class IPRoleMapperService {
         final File rangesConfigFile = new File(ConfigCollection
                 .getServletContext().getRealPath(rangesConfigFileName));
 
-        if ((rangesConfigFile.lastModified() != latestConfigFileModificationTime)
-                || (!lastConfigurationFilePath.equals(rangesConfigFile
-                        .getAbsolutePath()))) {
+        try {
+            if ((rangesConfigFile.lastModified() != latestConfigFileModificationTime)
+                    || (!lastConfigurationFilePath.equals(rangesConfigFile
+                    .getAbsolutePath()))) {
 
-            latestConfigFileModificationTime = rangesConfigFile.lastModified();
-            lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
+                latestConfigFileModificationTime = rangesConfigFile.lastModified();
+                lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
 
-            Logs.log(log, Logs.Level.INFO, "IP ranges configuration has "
-                    + "changed. Re-initialising from file: ",
-                    lastConfigurationFilePath);
-            // The configuration has changed. Re-initialise.
-            final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
-            final List<IPRangeRoles> ranges = rangesReader
-                    .readFromXMLConfigFile(rangesConfigFile);
-            IPRoleMapper.init(ranges);
+                Logs.log(log, Logs.Level.INFO, "IP ranges configuration has "
+                        + "changed. Re-initialising from file: ",
+                        lastConfigurationFilePath);
+                // The configuration has changed. Re-initialise.
+                final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
+                final List<IPRangeRoles> ranges = rangesReader
+                        .readFromXMLConfigFile(rangesConfigFile);
+                IPRoleMapper.init(ranges);
+            }
+        } catch (IOException ioException) {
+            // intentionally ignoring this exception.
+            log.warn("verifyConfiguration(): Failed (re-)initialising "
+                    + "configuration. Will proceed with the current"
+                    + " configuration. Configuration file: " + rangesConfigFile,
+                    ioException);
         }
-
         Logs.log(log, Logs.Level.TRACE, "verifyConfiguration(): Exiting.");
     }
 }
