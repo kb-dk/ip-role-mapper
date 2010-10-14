@@ -47,7 +47,6 @@ public class ServiceExceptionMapper implements ExceptionMapper<Exception> {
     /* (non-Javadoc)
      * @see javax.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Throwable)
      */
-    @Override
     public Response toResponse(Exception exception) {
 
         if (exception instanceof UnknownHostException) {
@@ -56,9 +55,7 @@ public class ServiceExceptionMapper implements ExceptionMapper<Exception> {
             return Response.status(ClientResponse.Status.BAD_REQUEST).entity(
                     "Could not lookup roles for the requested host. Reason: "
                             + exception.toString()).build();
-        } else if (exception instanceof XPathExpressionException
-                || exception instanceof IOException
-                || exception instanceof SAXException) {
+        } else if (exception instanceof IOException) {
             
             // Complain over a broken service configuration.
             return Response.status(ClientResponse.Status.INTERNAL_SERVER_ERROR)

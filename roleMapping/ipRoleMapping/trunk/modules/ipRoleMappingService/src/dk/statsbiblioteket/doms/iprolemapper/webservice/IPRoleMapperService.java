@@ -180,21 +180,8 @@ public class IPRoleMapperService {
      * @throws IOException
      *             if any problems are encountered while reading the
      *             configuration file.
-     * @throws SAXException
-     *             if any problems are encountered while parsing the
-     *             configuration file.
-     * @throws ParserConfigurationException
-     *             if any problems are encountered while preparing the XML
-     *             parser.
-     * @throws XPathExpressionException
-     *             if any problems are encountered while fetching the
-     *             information from the configuration file.
-     * @throws URISyntaxException
-     *             if the configuration file cannot be loaded.
      */
-    private void verifyConfiguration() throws XPathExpressionException,
-            ParserConfigurationException, SAXException, IOException,
-            URISyntaxException {
+    private void verifyConfiguration() throws IOException  {
 
         Logs.log(log, Logs.Level.TRACE, "verifyConfiguration(): Entering.");
 

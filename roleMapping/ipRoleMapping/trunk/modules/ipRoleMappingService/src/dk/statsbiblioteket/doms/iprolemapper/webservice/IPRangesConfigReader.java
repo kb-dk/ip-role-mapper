@@ -57,7 +57,7 @@ import dk.statsbiblioteket.util.xml.DOM;
 /**
  * This class is a factory class meant for production of lists of
  * <code>IPRange</code> instances from various configuration sources.
- * 
+ *
  * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
  */
 public class IPRangesConfigReader {
@@ -69,28 +69,15 @@ public class IPRangesConfigReader {
      * Produce a <code>List</code> of <code>IPRange</code> instances constructed
      * from the information read from the XML configuration specified by
      * <code>rangesConfigFile</code>.
-     * 
-     * @param rangesConfigFile
-     *            a <code>File</code> instance configured with the path to the
-     *            XML configuration file to read.
+     *
+     * @param rangesConfigFile a <code>File</code> instance configured with the path to the
+     *                         XML configuration file to read.
      * @return a list of <code>IPRange</code> instances, produced from the
      *         contents of the configuration file.
-     * @throws ParserConfigurationException
-     *             if any errors were encountered while instantiating a
-     *             <code>DocumentBuilder</code> for parsing the configuration.
-     * @throws IOException
-     *             if any errors are encountered while reading the configuration
-     *             file.
-     * @throws SAXException
-     *             if any errors are encountered while parsing the configuration
-     *             file.
-     * @throws XPathExpressionException
-     *             if any errors are encountered while parsing the configuration
-     *             file.
+     * @throws IOException                  if any errors are encountered while reading the configuration
+     *                                      file.
      */
-    public List<IPRangeRoles> readFromXMLConfigFile(File rangesConfigFile)
-            throws ParserConfigurationException, SAXException, IOException,
-            XPathExpressionException {
+    public List<IPRangeRoles> readFromXMLConfigFile(File rangesConfigFile) throws IOException {
 
         Logs.log(log, Logs.Level.TRACE,
                 "readFromXMLConfigFile(): Called with file path: ",
@@ -99,22 +86,51 @@ public class IPRangesConfigReader {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
                 .newInstance();
 
-        final DocumentBuilder documentBuilder = documentBuilderFactory
-                .newDocumentBuilder();
+        NodeList ipRangeNodes = null;
 
-        final Document configuationDocument = documentBuilder
-                .parse(rangesConfigFile);
+        try {
+            final DocumentBuilder documentBuilder = documentBuilderFactory
+                    .newDocumentBuilder();
 
-        final XPathFactory xPathFactory = XPathFactory.newInstance();
-        final XPath xPath = xPathFactory.newXPath();
+            final Document configuationDocument = documentBuilder
+                    .parse(rangesConfigFile);
 
-        final NodeList ipRangeNodes = (NodeList) xPath.evaluate(
-                "/ipranges/iprange", configuationDocument,
-                XPathConstants.NODESET);
+            final XPathFactory xPathFactory = XPathFactory.newInstance();
+            final XPath xPath = xPathFactory.newXPath();
 
+            ipRangeNodes = (NodeList) xPath.evaluate(
+                    "/ipranges/iprange", configuationDocument,
+                    XPathConstants.NODESET);
+        } catch (ParserConfigurationException parserConfigException) {
+            throw new IOException("Failed setting up parser",
+                    parserConfigException);
+        } catch (SAXException saxException) {
+            throw new IOException("Failed parsing configuration file '"
+                    + rangesConfigFile + "' due to ", saxException);
+
+        } catch (XPathExpressionException xPathExpressionException) {
+            throw new IOException("Failed parsing (evaluating) configuration"
+                    +" file '" + rangesConfigFile +"' due to ",
+                    xPathExpressionException);
+
+        }
         final List<IPRangeRoles> ipRangeList = new LinkedList<IPRangeRoles>();
         for (int nodeIdx = 0; nodeIdx < ipRangeNodes.getLength(); nodeIdx++) {
-            ipRangeList.add(produceIPRangeInstance(ipRangeNodes.item(nodeIdx)));
+            try {
+                ipRangeList.add(produceIPRangeInstance(ipRangeNodes.item(nodeIdx)));
+            }
+            catch (Exception cause) {
+                String ipRangeNodeXMLString = "Malformed IpRange.";
+                try {
+                    ipRangeNodeXMLString = DOM.domToString(ipRangeNodes.item(nodeIdx));
+                }
+                catch (Exception eTwo) {
+                    // Exception being ignored
+                }
+                Logs.log(log, Logs.Level.WARN,
+                        "readFromXMLConfigFile() failed to read IPRange: ",
+                        ipRangeNodeXMLString, cause);
+            }
         }
 
         Logs.log(log, Logs.Level.TRACE,
@@ -125,18 +141,18 @@ public class IPRangesConfigReader {
     }
 
     /**
-     * @param ipRangeNode
-     *            a <code>Document Node</code> containing information about an
-     *            IP range.
+     * @param ipRangeNode a <code>Document Node</code> containing information about an
+     *                    IP range.
      * @return an <code>IPRange</code> instance created from the information
      *         contained in <code>ipRangeNode</code>.
-     * @throws XPathExpressionException
-     *             if any errors are encountered while reading range roles from
-     *             <code>ipRangeNode</code>.
-     * @throws UnknownHostException
-     *             if the begin or end address of <code>ipRangeNode</code> is
-     *             either an unknown host name or illegal IP address.
-     * @throws IllegalArgumentException
+     * @throws XPathExpressionException if any errors are encountered while reading range roles from
+     *                                  <code>ipRangeNode</code>.
+     * @throws UnknownHostException     if the begin or end address of <code>ipRangeNode</code> is
+     *                                  either an unknown host name or illegal IP address.
+     * @throws IllegalArgumentException if the begin address and end address of the range is not of the same type.
+     *                                  I.e. if they are not both IPv4 of IPv6 addresses, or if
+     *                                  <code>beginAddress</code> is larger/higher/after
+     *                                  <code>endAddress</code>.
      */
     private IPRangeRoles produceIPRangeInstance(Node ipRangeNode)
             throws XPathExpressionException, IllegalArgumentException,
