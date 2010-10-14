@@ -106,11 +106,11 @@ public class IPRangesConfigReader {
                     parserConfigException);
         } catch (SAXException saxException) {
             throw new IOException("Failed parsing configuration file '"
-                    + rangesConfigFile + "' due to ", saxException);
+                    + rangesConfigFile + "'", saxException);
 
         } catch (XPathExpressionException xPathExpressionException) {
             throw new IOException("Failed parsing (evaluating) configuration"
-                    +" file '" + rangesConfigFile +"' due to ",
+                    +" file '" + rangesConfigFile +"'",
                     xPathExpressionException);
 
         }
