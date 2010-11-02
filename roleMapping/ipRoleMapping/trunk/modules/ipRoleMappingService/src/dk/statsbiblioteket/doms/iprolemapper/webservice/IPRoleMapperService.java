@@ -27,6 +27,7 @@
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Iterator;
@@ -82,10 +83,14 @@ public class IPRoleMapperService {
     public String getRoles(@PathParam("ipaddress") String ipAddress)
             throws Throwable {
 
-        Logs.log(log, Logs.Level.TRACE, "getRoles(): Called with IP adress: ",
-                ipAddress);
+        if (log.isTraceEnabled()) {
+            log.trace("getRoles(): Called with IP adress: " + ipAddress);
+        }
 
         try {
+            // The static content of IPRolemapper will be initialised by
+            // verifyConfiguration if the configuration can be successfully
+            // read.
             verifyConfiguration();
             final IPRoleMapper ipRoleMapper = new IPRoleMapper();
             final Set<String> mappedRoles = ipRoleMapper.mapIPHost(InetAddress
@@ -103,12 +108,12 @@ public class IPRoleMapperService {
                 }
             }// end-while
 
-            Logs.log(log, Logs.Level.TRACE,
-                    "IPRoleMapperService.getRoles(): returning roles: ",
-                    rolesString);
+            log.debug("IPRoleMapperService.getRoles(): returning roles: "
+                    + rolesString);
+
             return rolesString;
         } catch (Throwable throwable) {
-            log.error("getRoles(): Caught un-expected exception.", throwable);
+            log.warn("getRoles(): Caught un-expected exception.", throwable);
             throw throwable;
         }
     }
@@ -119,10 +124,14 @@ public class IPRoleMapperService {
     public String getRanges(@QueryParam("role") List<String> roles)
             throws Throwable {
 
-        Logs.log(log, Logs.Level.TRACE, "getRanges(): Called with roles: ",
-                roles);
+        if (log.isTraceEnabled()) {
+            log.trace("getRanges(): Called with roles: " + roles);
+        }
 
         try {
+            // The static content of IPRolemapper will be initialised by
+            // verifyConfiguration if the configuration can be successfully
+            // read.
             verifyConfiguration();
             final IPRoleMapper ipRoleMapper = new IPRoleMapper();
             final Set<IPRange> mappedRanges = ipRoleMapper
@@ -153,8 +162,8 @@ public class IPRoleMapperService {
                 }
             }// end-while
 
-            Logs.log(log, Logs.Level.TRACE, "getRanges(): returning ranges: ",
-                    rangesString);
+            log.debug("getRanges(): returning ranges: " + rangesString);
+
             return rangesString;
         } catch (Throwable throwable) {
             log.error("getRoles(): Caught un-expected exception.", throwable);
@@ -171,38 +180,47 @@ public class IPRoleMapperService {
      */
     private void verifyConfiguration() {
 
-        Logs.log(log, Logs.Level.TRACE, "verifyConfiguration(): Entering.");
+        log.trace("verifyConfiguration(): Entering.");
 
         // NOTE! Make sure that web.xml has a listener entry for the
         // ConfigContextListener otherwise this will go very, very wrong.
-
         final Properties configuration = ConfigCollection.getProperties();
 
-        final String rangesConfigFileName = (String) configuration
+        final String rangesConfigLocation = (String) configuration
                 .get("ipRangeAndRoleConfigurationFile");
 
-        Logs.log(log, Logs.Level.TRACE, "IPRoleMapperService(): "
-                + "About to load a configuration file at this location: ",
-                rangesConfigFileName);
-
-        if (rangesConfigFileName == null || rangesConfigFileName.length() == 0) {
-            throw new IllegalArgumentException("Bad file name for the IP "
-                    + "address ranges configuration file: "
-                    + rangesConfigFileName);
+        if (log.isTraceEnabled()) {
+            log.trace("IPRoleMapperService(): About to load a configuration "
+                    + "from this location: " + rangesConfigLocation);
         }
 
-        // FIXME! I'm not quite sure that this is the best way to locate the
-        // configuration file. Maybe the ResourceLocator from the PLANETS source
-        // could be useful.
-        final File rangesConfigFile = new File(ConfigCollection
-                .getServletContext().getRealPath(rangesConfigFileName));
+        if (rangesConfigLocation == null || rangesConfigLocation.length() == 0) {
+            throw new IllegalArgumentException("The location of the IP address"
+                    + " ranges configuration has not been specified.");
+        }
 
+        File rangesConfigFile = new File(rangesConfigLocation);
         try {
+            if (!rangesConfigFile.exists()) {
+                // The file could not be found, either because the path is not
+                // an absolute path or because it does not exist. Now try
+                // locating it within the WAR file before giving up.
+                rangesConfigFile = new File(ConfigCollection
+                        .getServletContext().getRealPath(rangesConfigLocation));
+
+                if (!rangesConfigFile.exists()) {
+                    throw new FileNotFoundException("Could not locate the "
+                            + "configuration file on the file system or within"
+                            + " this WAR: " + rangesConfigLocation);
+                }
+            }
+
             if ((rangesConfigFile.lastModified() != latestConfigFileModificationTime)
                     || (!lastConfigurationFilePath.equals(rangesConfigFile
-                    .getAbsolutePath()))) {
+                            .getAbsolutePath()))) {
 
-                latestConfigFileModificationTime = rangesConfigFile.lastModified();
+                latestConfigFileModificationTime = rangesConfigFile
+                        .lastModified();
                 lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
 
                 Logs.log(log, Logs.Level.INFO, "IP ranges configuration has "
@@ -217,10 +235,10 @@ public class IPRoleMapperService {
         } catch (IOException ioException) {
             // intentionally ignoring this exception.
             log.warn("verifyConfiguration(): Failed (re-)initialising "
-                    + "configuration. Will proceed with the current"
-                    + " configuration. Configuration file: " + rangesConfigFile,
-                    ioException);
+                    + "configuration. Will proceed with the current "
+                    + "configuration. The failing configuration file is: "
+                    + rangesConfigFile, ioException);
         }
-        Logs.log(log, Logs.Level.TRACE, "verifyConfiguration(): Exiting.");
+        log.trace("verifyConfiguration(): Exiting.");
     }
 }

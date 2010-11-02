@@ -30,16 +30,15 @@ import java.net.InetAddress;
 import java.util.List;
 
 /**
- *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
+ * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
  */
 public class IPRangeRoles extends IPRange {
 
     private final List<String> roles;
 
     /**
-     * Create an IP range starting at <code>beginAddress</code> and ending at
-     * <code>endAddress</code>. Both addresses are included in the range. <\p>
-     * The IP range is associated with the roles specified by <code>roles</code>
+     * Create an IP range associated with the roles specified by
+     * <code>roles</code>
      * 
      * @param beginAddress
      *            the start address of the range.
@@ -52,6 +51,7 @@ public class IPRangeRoles extends IPRange {
      *             I.e. if they are not both IPv4 of IPv6 addresses, or if
      *             <code>beginAddress</code> is larger/higher/after
      *             <code>endAddress</code>.
+     * @see IPRangeRoles#IPRangeRoles(InetAddress, InetAddress, List)
      */
     public IPRangeRoles(InetAddress beginAddress, InetAddress endAddress,
             List<String> roles) throws IllegalArgumentException {
