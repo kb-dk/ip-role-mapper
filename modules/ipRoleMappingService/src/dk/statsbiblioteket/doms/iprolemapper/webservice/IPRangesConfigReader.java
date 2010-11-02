@@ -57,7 +57,7 @@ import dk.statsbiblioteket.util.xml.DOM;
 /**
  * This class is a factory class meant for production of lists of
  * <code>IPRange</code> instances from various configuration sources.
- *
+ * 
  * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
  */
 public class IPRangesConfigReader {
@@ -66,22 +66,26 @@ public class IPRangesConfigReader {
             .getLog(IPRangesConfigReader.class);
 
     /**
-     * Produce a <code>List</code> of <code>IPRange</code> instances constructed
-     * from the information read from the XML configuration specified by
-     * <code>rangesConfigFile</code>.
-     *
-     * @param rangesConfigFile a <code>File</code> instance configured with the path to the
-     *                         XML configuration file to read.
-     * @return a list of <code>IPRange</code> instances, produced from the
+     * Produce a <code>List</code> of <code>IPRangeRoles</code> instances
+     * constructed from the information read from the XML configuration
+     * specified by <code>rangesConfigFile</code>.
+     * 
+     * @param rangesConfigFile
+     *            a <code>File</code> instance configured with the path to the
+     *            XML configuration file to read.
+     * @return a list of <code>IPRangeRoles</code> instances, produced from the
      *         contents of the configuration file.
-     * @throws IOException                  if any errors are encountered while reading the configuration
-     *                                      file.
+     * @throws IOException
+     *             if any errors are encountered while reading the configuration
+     *             file.
      */
-    public List<IPRangeRoles> readFromXMLConfigFile(File rangesConfigFile) throws IOException {
+    public List<IPRangeRoles> readFromXMLConfigFile(File rangesConfigFile)
+            throws IOException {
 
-        Logs.log(log, Logs.Level.TRACE,
-                "readFromXMLConfigFile(): Called with file path: ",
-                rangesConfigFile);
+        if (log.isTraceEnabled()) {
+            log.trace("readFromXMLConfigFile(): Called with file path: "
+                    + rangesConfigFile);
+        }
 
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
                 .newInstance();
@@ -98,9 +102,8 @@ public class IPRangesConfigReader {
             final XPathFactory xPathFactory = XPathFactory.newInstance();
             final XPath xPath = xPathFactory.newXPath();
 
-            ipRangeNodes = (NodeList) xPath.evaluate(
-                    "/ipranges/iprange", configuationDocument,
-                    XPathConstants.NODESET);
+            ipRangeNodes = (NodeList) xPath.evaluate("/ipranges/iprange",
+                    configuationDocument, XPathConstants.NODESET);
         } catch (ParserConfigurationException parserConfigException) {
             throw new IOException("Failed setting up parser",
                     parserConfigException);
@@ -110,21 +113,21 @@ public class IPRangesConfigReader {
 
         } catch (XPathExpressionException xPathExpressionException) {
             throw new IOException("Failed parsing (evaluating) configuration"
-                    +" file '" + rangesConfigFile +"'",
+                    + " file '" + rangesConfigFile + "'",
                     xPathExpressionException);
 
         }
         final List<IPRangeRoles> ipRangeList = new LinkedList<IPRangeRoles>();
         for (int nodeIdx = 0; nodeIdx < ipRangeNodes.getLength(); nodeIdx++) {
             try {
-                ipRangeList.add(produceIPRangeInstance(ipRangeNodes.item(nodeIdx)));
-            }
-            catch (Exception cause) {
+                ipRangeList.add(produceIPRangeInstance(ipRangeNodes
+                        .item(nodeIdx)));
+            } catch (Exception cause) {
                 String ipRangeNodeXMLString = "Malformed IpRange.";
                 try {
-                    ipRangeNodeXMLString = DOM.domToString(ipRangeNodes.item(nodeIdx));
-                }
-                catch (Exception eTwo) {
+                    ipRangeNodeXMLString = DOM.domToString(ipRangeNodes
+                            .item(nodeIdx));
+                } catch (Exception eTwo) {
                     // Exception being ignored
                 }
                 Logs.log(log, Logs.Level.WARN,
@@ -133,26 +136,34 @@ public class IPRangesConfigReader {
             }
         }
 
-        Logs.log(log, Logs.Level.TRACE,
-                "readFromXMLConfigFile(): Returning IP address ranges: ",
-                ipRangeList);
-
+        if (log.isTraceEnabled()) {
+            log.trace("readFromXMLConfigFile(): Returning IP address ranges: "
+                    + ipRangeList);
+        }
         return ipRangeList;
     }
 
     /**
-     * @param ipRangeNode a <code>Document Node</code> containing information about an
-     *                    IP range.
-     * @return an <code>IPRange</code> instance created from the information
-     *         contained in <code>ipRangeNode</code>.
-     * @throws XPathExpressionException if any errors are encountered while reading range roles from
-     *                                  <code>ipRangeNode</code>.
-     * @throws UnknownHostException     if the begin or end address of <code>ipRangeNode</code> is
-     *                                  either an unknown host name or illegal IP address.
-     * @throws IllegalArgumentException if the begin address and end address of the range is not of the same type.
-     *                                  I.e. if they are not both IPv4 of IPv6 addresses, or if
-     *                                  <code>beginAddress</code> is larger/higher/after
-     *                                  <code>endAddress</code>.
+     * This method produces an <code>IPRangeRoles</code> instance from the
+     * information stored in the <code>Node</code> specified by
+     * <code>ipRangeNode</code>.
+     * 
+     * @param ipRangeNode
+     *            a <code>Document Node</code> containing information about an
+     *            IP range and its associated roles.
+     * @return an <code>IPRangeRoles</code> instance created from the
+     *         information contained in <code>ipRangeNode</code>.
+     * @throws XPathExpressionException
+     *             if any errors are encountered while reading range roles from
+     *             <code>ipRangeNode</code>.
+     * @throws UnknownHostException
+     *             if the begin or end address of <code>ipRangeNode</code> is
+     *             either an unknown host name or an illegal IP address.
+     * @throws IllegalArgumentException
+     *             if the begin address and end address of the range is not of
+     *             the same type. I.e. if they are not both IPv4 or IPv6
+     *             addresses, or if <code>beginAddress</code> is higher/after
+     *             <code>endAddress</code>.
      */
     private IPRangeRoles produceIPRangeInstance(Node ipRangeNode)
             throws XPathExpressionException, IllegalArgumentException,
@@ -192,9 +203,10 @@ public class IPRangesConfigReader {
                 .getByName(beginAddress), InetAddress.getByName(endAddress),
                 ipRangeRoles);
 
-        Logs.log(log, Logs.Level.TRACE,
-                "produceIPRangeInstance(): Returning IPRangeRoles instance: ",
-                rangeRoles);
+        if (log.isTraceEnabled()) {
+            log.trace("produceIPRangeInstance(): Returning IPRangeRoles "
+                    + "instance: " + rangeRoles);
+        }
         return rangeRoles;
     }
 }

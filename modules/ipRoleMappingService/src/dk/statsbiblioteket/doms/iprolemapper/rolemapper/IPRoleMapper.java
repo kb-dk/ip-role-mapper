@@ -38,8 +38,6 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import dk.statsbiblioteket.util.Logs;
-
 /**
  * The <code>IPRoleMapper</code> is capable of associating a number of roles
  * with an IP address based on a number of IP address ranges, which again are
@@ -55,13 +53,14 @@ public class IPRoleMapper {
      * A map for mapping an IP range start address to a list of all IP ranges
      * starting at that particular address.
      */
-    private static TreeMap<InetAddress, LinkedList<IPRangeRoles>> startAddrRangeMapList;
+    private static TreeMap<InetAddress, LinkedList<IPRangeRoles>> startAddrRangeMapList = new TreeMap<InetAddress, LinkedList<IPRangeRoles>>(
+            new InetAddressComparator());
 
     /**
      * A map for mapping all known role names with the ranges associated with
      * them.
      */
-    private static TreeMap<String, LinkedList<IPRange>> roleIPRangeMapList;
+    private static TreeMap<String, LinkedList<IPRange>> roleIPRangeMapList = new TreeMap<String, LinkedList<IPRange>>();
 
     /**
      * Map a host name or IP address to one or more roles all roles of the known
@@ -75,8 +74,9 @@ public class IPRoleMapper {
      */
     public Set<String> mapIPHost(InetAddress ipAddress) {
 
-        Logs.log(log, Logs.Level.TRACE,
-                "mapIPHost(): Called with InetAddress: ", ipAddress);
+        if (log.isTraceEnabled()) {
+            log.trace("mapIPHost(): Called with InetAddress: " + ipAddress);
+        }
 
         final Set<String> collectedRoles = new TreeSet<String>();
 
@@ -109,8 +109,10 @@ public class IPRoleMapper {
             } // end-for test of candidate range list.
         }
 
-        Logs.log(log, Logs.Level.TRACE,
-                "mapIPHost(): Returning collected roles: ", collectedRoles);
+        if (log.isTraceEnabled()) {
+            log.trace("mapIPHost(): Returning collected roles: "
+                    + collectedRoles);
+        }
 
         return collectedRoles;
     }
@@ -125,18 +127,25 @@ public class IPRoleMapper {
      */
     public Set<IPRange> mapRoles(Set<String> roles) {
 
-        Logs.log(log, Logs.Level.TRACE, "mapRoles(): Called with roles: ",
-                roles);
+        if (log.isTraceEnabled()) {
+            log.trace("mapRoles(): Called with roles: " + roles);
+        }
 
         // Collect all the ranges associated with the roles specified. Use a set
         // to eliminate duplicate IPRange objects.
         final Set<IPRange> associatedRanges = new HashSet<IPRange>();
         for (String role : roles) {
-            associatedRanges.addAll(roleIPRangeMapList.get(role));
+            final List<IPRange> associatedRoleRanges = roleIPRangeMapList
+                    .get(role);
+            if (associatedRoleRanges != null) {
+                associatedRanges.addAll(associatedRoleRanges);
+            }
         }
 
-        Logs.log(log, Logs.Level.TRACE,
-                "mapRoles(): Returning IP address ranges: ", associatedRanges);
+        if (log.isTraceEnabled()) {
+            log.trace("mapRoles(): Returning IP address ranges: "
+                    + associatedRanges);
+        }
 
         return associatedRanges;
     }
@@ -152,9 +161,9 @@ public class IPRoleMapper {
      */
     public static synchronized void init(List<IPRangeRoles> ranges) {
 
-        Logs.log(log, Logs.Level.TRACE, "init(): Called with IPRangeRoles: ",
-                ranges);
-
+        if (log.isTraceEnabled()) {
+            log.trace("init(): Called with IPRangeRoles: " + ranges);
+        }
         startAddrRangeMapList = new TreeMap<InetAddress, LinkedList<IPRangeRoles>>(
                 new InetAddressComparator());
 
@@ -191,7 +200,8 @@ public class IPRoleMapper {
             }
         }// end-for
 
-        Logs.log(log, Logs.Level.TRACE,
-                "init(): Finished initialisation. Exiting.");
+        if (log.isTraceEnabled()) {
+            log.trace("init(): Finished initialisation. Exiting.");
+        }
     }
 }
