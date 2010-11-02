@@ -26,31 +26,21 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator;
 import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 import dk.statsbiblioteket.util.Logs;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.ws.rs.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.*;
 
 //import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 //
@@ -109,7 +99,7 @@ public class IPRoleMapperService {
             }// end-while
 
             log.debug("IPRoleMapperService.getRoles(): returning roles: "
-                    + rolesString);
+                      + rolesString);
 
             return rolesString;
         } catch (Throwable throwable) {
@@ -153,7 +143,7 @@ public class IPRoleMapperService {
                 } else {
                     // It's an actual range...
                     rangesString += beginAddress.getHostAddress() + "-"
-                            + endAddress.getHostAddress();
+                                    + endAddress.getHostAddress();
                 }
 
                 // Append a comma if there are more roles left.
@@ -186,17 +176,17 @@ public class IPRoleMapperService {
         // ConfigContextListener otherwise this will go very, very wrong.
         final Properties configuration = ConfigCollection.getProperties();
 
-        final String rangesConfigLocation = (String) configuration
-                .get("ipRangeAndRoleConfigurationFile");
+        final String rangesConfigLocation = configuration.getProperty
+                ("dk.statsbiblioteket.iprolemapping.configurationFile");
 
         if (log.isTraceEnabled()) {
             log.trace("IPRoleMapperService(): About to load a configuration "
-                    + "from this location: " + rangesConfigLocation);
+                      + "from this location: " + rangesConfigLocation);
         }
 
         if (rangesConfigLocation == null || rangesConfigLocation.length() == 0) {
             throw new IllegalArgumentException("The location of the IP address"
-                    + " ranges configuration has not been specified.");
+                                               + " ranges configuration has not been specified.");
         }
 
         File rangesConfigFile = new File(rangesConfigLocation);
@@ -210,22 +200,22 @@ public class IPRoleMapperService {
 
                 if (!rangesConfigFile.exists()) {
                     throw new FileNotFoundException("Could not locate the "
-                            + "configuration file on the file system or within"
-                            + " this WAR: " + rangesConfigLocation);
+                                                    + "configuration file on the file system or within"
+                                                    + " this WAR: " + rangesConfigLocation);
                 }
             }
 
             if ((rangesConfigFile.lastModified() != latestConfigFileModificationTime)
-                    || (!lastConfigurationFilePath.equals(rangesConfigFile
-                            .getAbsolutePath()))) {
+                || (!lastConfigurationFilePath.equals(rangesConfigFile
+                    .getAbsolutePath()))) {
 
                 latestConfigFileModificationTime = rangesConfigFile
                         .lastModified();
                 lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
 
                 Logs.log(log, Logs.Level.INFO, "IP ranges configuration has "
-                        + "changed. Re-initialising from file: ",
-                        lastConfigurationFilePath);
+                                               + "changed. Re-initialising from file: ",
+                         lastConfigurationFilePath);
                 // The configuration has changed. Re-initialise.
                 final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
                 final List<IPRangeRoles> ranges = rangesReader
@@ -235,9 +225,9 @@ public class IPRoleMapperService {
         } catch (IOException ioException) {
             // intentionally ignoring this exception.
             log.warn("verifyConfiguration(): Failed (re-)initialising "
-                    + "configuration. Will proceed with the current "
-                    + "configuration. The failing configuration file is: "
-                    + rangesConfigFile, ioException);
+                     + "configuration. Will proceed with the current "
+                     + "configuration. The failing configuration file is: "
+                     + rangesConfigFile, ioException);
         }
         log.trace("verifyConfiguration(): Exiting.");
     }
