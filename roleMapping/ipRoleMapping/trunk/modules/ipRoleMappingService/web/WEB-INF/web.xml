@@ -12,7 +12,7 @@
     </context-param>
 
     <context-param>
-        <param-name>ipRangeAndRoleConfigurationFile</param-name>
+        <param-name>dk.statsbiblioteket.iprolemapping.configurationFile</param-name>
         <param-value>/WEB-INF/ipRangesAndRoles.xml</param-value>
     </context-param>
 
