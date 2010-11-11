@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ipranges>
     <iprange begin="130.225.24.0" end="130.225.25.255">
-        <!--Internt-->
+        <!-- Inhouse non-NAT addresses -->
         <role>inhouse</role>
     </iprange>
     <iprange begin="130.225.26.33" end="130.225.26.33">
-        <!--Intern NAT-->
+        <!-- External addresses for inhouse NAT addresses -->
         <role>inhouse</role>
     </iprange>
     <iprange begin="130.255.26.35" end="130.255.26.35">
-        <!--VPN NAT-->
+        <!-- External addresses for VPN NAT addresses -->
         <role>inhouse</role>
     </iprange>
     <iprange begin="172.16.7.0" end="172.16.7.255">
-        <!--SB NAT-->
+        <!-- Inhouse VPN NAT addresses -->
         <role>inhouse</role>
     </iprange>
     <iprange begin="172.18.0.0" end="172.18.255.255">
-        <!--Intern NAT-->
+        <!-- Inhouse NAT addresses -->
         <role>inhouse</role>
     </iprange>
 </ipranges>

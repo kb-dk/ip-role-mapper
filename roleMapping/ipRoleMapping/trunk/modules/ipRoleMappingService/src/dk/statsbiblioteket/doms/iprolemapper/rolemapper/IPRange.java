@@ -29,8 +29,7 @@ package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 import java.net.InetAddress;
 
 /**
- *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
- * 
+ * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
 public class IPRange {
 
@@ -82,6 +81,84 @@ public class IPRange {
      */
     public InetAddress getEndAddress() {
         return endAddress;
+    }
+
+    /**
+     * Merge this <code>IPRange</code> instance with the overlapping range
+     * specified by <code>overlappingRange</code>. That is, create a new
+     * <code>IPRange</code> instance with the lowest begin address and the
+     * highest end address of the two ranges.
+     * <p/>
+     * This method will throw an exception if <code>overlappingRange</code> does
+     * not overlap this range.
+     * 
+     * @param overlappingRange
+     *            an <code>IPRange</code> that overlaps this range.
+     * @return an <code>IPRange</code> containing the result of the merge
+     *         operation.
+     * @throws IllegalArgumentException
+     *             if <code>overlappingRange</code> does not overlap this range.
+     */
+    public IPRange merge(IPRange overlappingRange)
+            throws IllegalArgumentException {
+
+        if (!overlaps(overlappingRange)) {
+            throw new IllegalArgumentException("The IP range: "
+                    + overlappingRange + " does not overlap this range: "
+                    + toString());
+        }
+
+        final InetAddressComparator comparator = new InetAddressComparator();
+
+        final InetAddress resultStartAddress = comparator.compare(
+                getBeginAddress(), overlappingRange.getBeginAddress()) < 0 ? getBeginAddress()
+                : overlappingRange.getBeginAddress();
+
+        final InetAddress resultEndAddress = comparator.compare(
+                getEndAddress(), overlappingRange.getEndAddress()) > 0 ? getEndAddress()
+                : overlappingRange.getEndAddress();
+
+        return new IPRange(resultStartAddress, resultEndAddress);
+    }
+
+    /**
+     * Test whether this <code>IPRange</code> overlaps the IP range specified by
+     * <code>ipRange</code>.
+     * 
+     * @param ipRange
+     *            other <code>IPRange</code> instance to test for overlap.
+     * @return <code>true</code> if there is an overlap between this IP range
+     *         and <code>ipRange</code> and otherwise false.
+     */
+    public boolean overlaps(IPRange ipRange) {
+
+        final InetAddressComparator comparator = new InetAddressComparator();
+
+        final InetAddress rangeBegin = ipRange.getBeginAddress();
+        final InetAddress rangeEnd = ipRange.getEndAddress();
+
+        // The below comparison are based on the (safe) assumption that begin
+        // addresses are lower than end addresses. The IPRange implementation
+        // ensures this.
+
+        if (comparator.compare(rangeEnd, beginAddress) < 0) {
+            return false;
+        }
+
+        if (comparator.compare(rangeEnd, endAddress) <= 0) {
+            return true;
+        }
+
+        if (comparator.compare(endAddress, rangeBegin) < 0) {
+            return false;
+        }
+
+        if (comparator.compare(endAddress, rangeEnd) <= 0) {
+            return true;
+        }
+
+        // Never reached. However, the compiler refuses to realise that.
+        return false;
     }
 
     /* (non-Javadoc)

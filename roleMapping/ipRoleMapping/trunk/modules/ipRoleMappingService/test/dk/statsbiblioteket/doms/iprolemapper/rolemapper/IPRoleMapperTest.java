@@ -27,6 +27,7 @@
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -39,7 +40,7 @@ import java.util.Set;
 import org.junit.Test;
 
 /**
- *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
+ * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
 public class IPRoleMapperTest {
 
@@ -100,6 +101,20 @@ public class IPRoleMapperTest {
         assertEquals(expectedRoles, associatedRoles);
     }
 
+    /**
+     * Test method for
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper#mapRoles(Set<String>)}
+     * .
+     * 
+     * @throws UnknownHostException
+     *             if any of the hard-coded IP addresses are illegal. This will
+     *             not happen.
+     */
+    @Test
+    public void testMapRoles() throws UnknownHostException {
+        fail("Implement this test.");
+    }
+    
     private List<IPRangeRoles> createIPv4TestRanges() throws UnknownHostException {
 
         // Note: It is important that the sub-arrays in rangeSetups contain a
