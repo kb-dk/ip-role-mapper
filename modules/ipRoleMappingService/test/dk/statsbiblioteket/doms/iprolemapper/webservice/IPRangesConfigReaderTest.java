@@ -27,9 +27,11 @@
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,12 +63,22 @@ public class IPRangesConfigReaderTest {
 
         // See if we survive reading Mads' insane configuration.
         IPRangesConfigReader configReader = new IPRangesConfigReader();
-        // FIXME! Find a more flexible way to locate the file. The file cannot
-        // be found on some systems depending on the configuration of the
-        // project root. Maybe the ResourceLocator from the PLANETS source could
-        // be useful.
+
+        // NOTE! This test will need access to the config directory via the
+        // classpath in order to function properly.
+        final String configFilePath = "config/madstest.xml";
+        final URL configURL = ClassLoader.getSystemResource(configFilePath);
+
+        assertNotNull("Cannot locate the test configuration file. Make sure "
+                + "that '" + configFilePath
+                + "' is accessible via the class path.", configURL);
+
+        System.out.println(this.getClass().getName()
+                + ".testReadFromXMLConfigFile(): About to read configuration "
+                + "from: " + configURL);
+
         List<IPRangeRoles> ipRanges = configReader
-                .readFromXMLConfigFile(new File("config/madstest.xml"));
+                .readFromXMLConfigFile(new File(configURL.getFile()));
         assertEquals(
                 "Un-expected number of IPRange instances were produced from the configuration file.",
                 967, ipRanges.size());
