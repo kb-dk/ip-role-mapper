@@ -26,11 +26,15 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,11 +42,23 @@ import org.junit.Test;
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
- * 
  */
 public class SortedListTest {
 
+    private final Integer[] testValues;
+    private final Integer[] sortedTestValues;
+
     private SortedList<Integer> testList;
+
+    /**
+     * 
+     */
+    public SortedListTest() {
+        testValues = new Integer[] { 10, 2, 3, 0, 2, 7, 2, 6, 1, 0, 10, 7, 8, 2 };
+        Integer[] testClone = testValues.clone();
+        Arrays.sort(testClone);
+        sortedTestValues = testClone;
+    }
 
     /**
      * @throws java.lang.Exception
@@ -74,14 +90,12 @@ public class SortedListTest {
      */
     @Test
     public void testAdd() {
-        Integer[] testValues = { 10, 2, 3, 0, 2, 7, 2, 6, 1, 0, 10, 7, 8, 2 };
         for (Integer integer : testValues) {
-            testList.add(integer);
+            assertTrue(testList.add(integer));
         }
 
-        Arrays.sort(testValues);
         Integer[] testListArray = new Integer[11];
-        assertTrue(Arrays.deepEquals(testValues, testList
+        assertTrue(Arrays.deepEquals(sortedTestValues, testList
                 .toArray(testListArray)));
     }
 
@@ -92,7 +106,11 @@ public class SortedListTest {
      */
     @Test
     public void testAddAll() {
-        fail("Not yet implemented");
+        assertTrue(testList.addAll(Arrays.asList(testValues)));
+
+        Integer[] testListArray = new Integer[11];
+        assertTrue(Arrays.deepEquals(sortedTestValues, testList
+                .toArray(testListArray)));
     }
 
     /**
@@ -101,7 +119,10 @@ public class SortedListTest {
      */
     @Test
     public void testClear() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+        assertFalse(testList.isEmpty());
+        testList.clear();
+        assertTrue(testList.isEmpty());
     }
 
     /**
@@ -111,7 +132,8 @@ public class SortedListTest {
      */
     @Test
     public void testContains() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+        assertTrue(testList.contains(testValues[7]));
     }
 
     /**
@@ -121,7 +143,8 @@ public class SortedListTest {
      */
     @Test
     public void testContainsAll() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+        assertTrue(testList.containsAll(Arrays.asList(sortedTestValues)));
     }
 
     /**
@@ -130,7 +153,14 @@ public class SortedListTest {
      */
     @Test
     public void testGet() {
-        fail("Not yet implemented");
+
+        testList.addAll(Arrays.asList(testValues));
+
+        // Expect the same element value at the same positions of the two sorted
+        // lists.
+        final int testProbeIndex = 7;
+        assertEquals(sortedTestValues[testProbeIndex], testList
+                .get(testProbeIndex));
     }
 
     /**
@@ -140,7 +170,14 @@ public class SortedListTest {
      */
     @Test
     public void testIndexOf() {
-        fail("Not yet implemented");
+
+        testList.addAll(Arrays.asList(testValues));
+        final Integer testValue = testValues[5];
+        final int referenceIndex = Arrays.asList(sortedTestValues).indexOf(
+                testValue);
+        assertEquals("The test value '" + testValue
+                + "' was not found at the expected position.", referenceIndex,
+                testList.indexOf(testValue));
     }
 
     /**
@@ -149,7 +186,9 @@ public class SortedListTest {
      */
     @Test
     public void testIsEmpty() {
-        fail("Not yet implemented");
+        assertTrue(testList.isEmpty());
+        testList.addAll(Arrays.asList(testValues));
+        assertFalse(testList.isEmpty());
     }
 
     /**
@@ -159,7 +198,17 @@ public class SortedListTest {
      */
     @Test
     public void testIterator() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+        Iterator<Integer> intIterator = testList.iterator();
+        assertTrue(intIterator.hasNext());
+
+        // Iterate through the sorted values and compare them to the reference
+        // list.
+        Iterator<Integer> referenceIterator = Arrays.asList(sortedTestValues)
+                .iterator();
+        while (intIterator.hasNext()) {
+            assertEquals(referenceIterator.next(), intIterator.next());
+        }
     }
 
     /**
@@ -169,7 +218,14 @@ public class SortedListTest {
      */
     @Test
     public void testLastIndexOf() {
-        fail("Not yet implemented");
+
+        testList.addAll(Arrays.asList(testValues));
+        final Integer testValue = testValues[5];
+        final int referenceIndex = Arrays.asList(sortedTestValues).lastIndexOf(
+                testValue);
+        assertEquals("The test value '" + testValue
+                + "' was not found at the expected position.", referenceIndex,
+                testList.lastIndexOf(testValue));
     }
 
     /**
@@ -179,7 +235,15 @@ public class SortedListTest {
      */
     @Test
     public void testRemoveInt() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+
+        final int referenceIndex = 6;
+        final Integer testValue = sortedTestValues[referenceIndex];
+
+        assertEquals(testValue, testList.get(referenceIndex));
+        assertEquals("An un-expected element value was removed.", testValue,
+                testList.remove(referenceIndex));
+        assertFalse(testValue.equals(testList.get(referenceIndex)));
     }
 
     /**
@@ -189,7 +253,19 @@ public class SortedListTest {
      */
     @Test
     public void testRemoveT() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+
+        final int referenceIndex = 2;
+        final Integer testValue = sortedTestValues[referenceIndex];
+
+        assertEquals("The test value '" + testValue
+                + "' was not found at the expected position.", referenceIndex,
+                testList.indexOf(testValue));
+        assertTrue("The list was expected to change.", testList
+                .remove(testValue));
+        assertFalse("The test value '" + testValue
+                + "' does not seem to be removed from the list.",
+                referenceIndex == testList.indexOf(testValue));
     }
 
     /**
@@ -199,7 +275,23 @@ public class SortedListTest {
      */
     @Test
     public void testRemoveAll() {
-        fail("Not yet implemented");
+
+        // Build a helper list of elements to remove.
+        ArrayList<Integer> elementsToRemove = new ArrayList<Integer>();
+        for (int index = 0; index < sortedTestValues.length; index += 2) {
+            elementsToRemove.add(sortedTestValues[index]);
+        }
+
+        // Fill the test list and remove the elements.
+        testList.addAll(Arrays.asList(testValues));
+        testList.removeAll(elementsToRemove);
+
+        // Verify that the removed elements do no longer exist in the list.
+        for (Integer removedElement : elementsToRemove) {
+            assertFalse("The removed element '" + removedElement
+                    + "' still exists in the list.", testList
+                    .contains(removedElement));
+        }
     }
 
     /**
@@ -209,7 +301,23 @@ public class SortedListTest {
      */
     @Test
     public void testRetainAll() {
-        fail("Not yet implemented");
+        // Build a helper list of elements to keep.
+        ArrayList<Integer> elementsToKeep = new ArrayList<Integer>();
+        for (int index = 0; index < sortedTestValues.length; index += 2) {
+            elementsToKeep.add(sortedTestValues[index]);
+        }
+
+        // Fill the test list and remove the elements not represented in the
+        // elementsToKeep list.
+        testList.addAll(Arrays.asList(testValues));
+        testList.retainAll(elementsToKeep);
+
+        // Verify that the elements to retain still exist in the list.
+        for (Integer retainedElement : elementsToKeep) {
+            assertFalse("The element '" + retainedElement
+                    + "' was not retained in the list.", -1 == testList
+                    .indexOf(retainedElement));
+        }
     }
 
     /**
@@ -218,7 +326,9 @@ public class SortedListTest {
      */
     @Test
     public void testSize() {
-        fail("Not yet implemented");
+        assertTrue(testList.size() == 0);
+        testList.addAll(Arrays.asList(testValues));
+        assertTrue(testList.size() != 0);
     }
 
     /**
@@ -228,7 +338,17 @@ public class SortedListTest {
      */
     @Test
     public void testSubList() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+
+        final int fromIndex = 3;
+        final int toIndex = 7;
+        final List<Integer> referenceList = Arrays.asList(sortedTestValues)
+                .subList(fromIndex, toIndex);
+
+        final List<Integer> subTestList = testList.subList(fromIndex, toIndex);
+
+        assertTrue(referenceList.equals(subTestList));
+
     }
 
     /**
@@ -237,7 +357,8 @@ public class SortedListTest {
      */
     @Test
     public void testToArray() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+        assertTrue(Arrays.deepEquals(sortedTestValues, testList.toArray()));
     }
 
     /**
@@ -247,7 +368,7 @@ public class SortedListTest {
      */
     @Test
     public void testToArrayTArray() {
-        fail("Not yet implemented");
+        testList.addAll(Arrays.asList(testValues));
+        assertTrue(Arrays.deepEquals(sortedTestValues, testList.toArray()));
     }
-
 }

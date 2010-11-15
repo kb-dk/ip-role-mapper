@@ -37,11 +37,14 @@ import org.junit.Test;
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
-public class InetAddressComparatorTest {
+public class IPRangeComparatorTest {
 
-    InetAddress lowIPv4Address;
-    InetAddress lowIPv4AddressClone;
-    InetAddress highIPv4Address;
+    InetAddress lowIPv4Address1;
+    InetAddress lowIPv4Address2;
+    InetAddress lowIPv4Address2Clone;
+
+    InetAddress highIPv4Address1;
+    InetAddress highIPv4Address2;
 
     InetAddress lowIPv6Address;
     InetAddress lowIPv6AddressClone;
@@ -52,9 +55,12 @@ public class InetAddressComparatorTest {
      */
     @Before
     public void setUp() throws Exception {
-        lowIPv4Address = InetAddress.getByName("10.50.0.42");
-        lowIPv4AddressClone = InetAddress.getByName("10.50.0.42");
-        highIPv4Address = InetAddress.getByName("192.168.0.42");
+        lowIPv4Address1 = InetAddress.getByName("10.50.0.1");
+        lowIPv4Address2 = InetAddress.getByName("10.50.0.42");
+        lowIPv4Address2Clone = InetAddress.getByName("10.50.0.42");
+
+        highIPv4Address1 = InetAddress.getByName("10.50.0.34");
+        highIPv4Address2 = InetAddress.getByName("10.50.2.34");
 
         lowIPv6Address = InetAddress
                 .getByName("1020:3040:5060:0:1337:b007:c4fe:f00d");
@@ -66,35 +72,59 @@ public class InetAddressComparatorTest {
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator#compare(java.net.InetAddress, java.net.InetAddress)}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeComparator#compare(dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange, dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange)}
      * .
      */
     @Test
     public void testCompareIPv4() {
-        final InetAddressComparator comparator = new InetAddressComparator();
-        assertEquals(
-                "Failed comparing two similar IPv4 InetAddress instances.", 0,
-                comparator.compare(lowIPv4Address, lowIPv4AddressClone));
+        final IPRangeComparator comparator = new IPRangeComparator();
+
+        final IPRange testIPRange1 = new IPRange(lowIPv4Address2,
+                highIPv4Address2);
+        final IPRange testIPRange2 = new IPRange(lowIPv4Address2,
+                highIPv4Address2);
+        assertEquals("Failed comparing two similar IPRange instances.", 0,
+                comparator.compare(testIPRange1, testIPRange2));
+
         assertEquals(
                 "Failed comparing an IPv4 InetAddress instances with it self.",
-                0, comparator.compare(lowIPv4Address, lowIPv4Address));
+                0, comparator.compare(testIPRange1, testIPRange1));
+
+        final IPRange smallerRange1 = new IPRange(lowIPv4Address1,
+                highIPv4Address1);
         assertEquals(
                 "Failed performing a \"less than\" comparison of two IPv4 "
-                        + "InetAddress instances.", -1, comparator.compare(
-                        lowIPv4Address, highIPv4Address));
+                        + "IPRange instances.", -1, comparator.compare(
+                        smallerRange1, testIPRange1));
+
         assertEquals(
                 "Failed performing a \"greater than\" comparison of two IPv4 "
-                        + "InetAddress instances.", 1, comparator.compare(
-                        highIPv4Address, lowIPv4Address));
+                        + "IPRange instances.", 1, comparator.compare(
+                        testIPRange1, smallerRange1));
+
+        final IPRange smallerRange2 = new IPRange(lowIPv4Address1,
+                lowIPv4Address2);
+        final IPRange largerRange2 = new IPRange(lowIPv4Address1,
+                highIPv4Address2);
+        assertEquals(
+                "Failed performing a \"less than\" comparison of two IPv4 "
+                        + "IPRange instances.", -1, comparator.compare(
+                        smallerRange2, largerRange2));
+
+        assertEquals(
+                "Failed performing a \"greater than\" comparison of two IPv4 "
+                        + "IPRange instances.", 1, comparator.compare(
+                        largerRange2, smallerRange2));
     }
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator#compare(java.net.InetAddress, java.net.InetAddress)}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeComparator#compare(dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange, dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange)}
      * .
      */
     @Test
     public void testCompareIPv6() {
+        fail("Not implemented.");
         final InetAddressComparator comparator = new InetAddressComparator();
         assertEquals(
                 "Failed comparing two similar IPv6 InetAddress instances.", 0,
@@ -114,14 +144,15 @@ public class InetAddressComparatorTest {
 
     /**
      * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator#compare(java.net.InetAddress, java.net.InetAddress)}
+     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeComparator#compare(dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange, dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange)}
      * .
      */
     @Test
     public void testCompareErrorScenarios() {
+        fail("Not implemented.");
         final InetAddressComparator comparator = new InetAddressComparator();
         try {
-            comparator.compare(lowIPv4Address, lowIPv6Address);
+            comparator.compare(lowIPv4Address2, lowIPv6Address);
             fail("Expected a ClassCastException when comparing an IPv4 "
                     + "InetAddress with an IPv6 InetAddress.");
         } catch (ClassCastException classCastException) {
@@ -130,7 +161,7 @@ public class InetAddressComparatorTest {
 
         // Now, check the other way around.
         try {
-            comparator.compare(lowIPv6Address, lowIPv4Address);
+            comparator.compare(lowIPv6Address, lowIPv4Address2);
             fail("Expected a ClassCastException when comparing an IPv6 "
                     + "InetAddress with an IPv4 InetAddress.");
         } catch (ClassCastException classCastException) {

@@ -42,7 +42,7 @@ import java.util.List;
  * 
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
-public class SortedList<T> {
+public class SortedList<T> implements Collection<T> {
 
     private final LinkedList<T> elementList;
     private final Comparator<T> elementComparator;
@@ -83,15 +83,16 @@ public class SortedList<T> {
      *             if some property of this element prevents it from being added
      *             to this list
      */
-    public void add(T element) {
+    public boolean add(T element) {
         final int insertPos = findInsertionPosition(elementList,
                 elementComparator, element);
 
         if (insertPos < elementList.size()) {
             elementList.add(insertPos, element);
+            return true;
         } else {
             // Handle insertion into an empty list or at the end of the list.
-            elementList.add(element);
+            return elementList.add(element);
         }
     }
 
@@ -121,10 +122,12 @@ public class SortedList<T> {
      *             prevents it from being added to this list
      * @see #add(Object)
      */
-    public void addAll(Collection<? extends T> elements) {
+    public boolean addAll(Collection<? extends T> elements) {
+        boolean collectionHasChanged = false;
         for (T element : elements) {
-            add(element);
+            collectionHasChanged |= add(element);
         }
+        return collectionHasChanged;
     }
 
     /**
@@ -154,7 +157,7 @@ public class SortedList<T> {
      *             if the specified element is null and this list does not
      *             permit null elements (optional)
      */
-    public boolean contains(T element) {
+    public boolean contains(Object element) {
         return elementList.contains(element);
     }
 
@@ -175,9 +178,9 @@ public class SortedList<T> {
      *             (optional), or if the specified collection is null
      * @see #contains(Object)
      */
-    public boolean containsAll(Collection<T> elements) {
+    public boolean containsAll(Collection<?> elements) {
         boolean allContained = true;
-        for (T element : elements) {
+        for (Object element : elements) {
             allContained &= elementList.contains(element);
             if (allContained == false) {
                 break;
@@ -305,7 +308,7 @@ public class SortedList<T> {
      *             if the <tt>remove</tt> operation is not supported by this
      *             list
      */
-    public boolean remove(T element) {
+    public boolean remove(Object element) {
         return elementList.remove(element);
     }
 
@@ -329,7 +332,7 @@ public class SortedList<T> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    public boolean removeAll(Collection<T> elements) {
+    public boolean removeAll(Collection<?> elements) {
         return elementList.removeAll(elements);
     }
 
@@ -355,7 +358,7 @@ public class SortedList<T> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    public boolean retainAll(Collection<T> elements) {
+    public boolean retainAll(Collection<?> elements) {
         return elementList.retainAll(elements);
     }
 
@@ -479,7 +482,7 @@ public class SortedList<T> {
      * @throws NullPointerException
      *             if the specified array is null
      */
-    public T[] toArray(T[] resultArray) {
+    public <U> U[] toArray(U[] resultArray) {
         return elementList.toArray(resultArray);
     }
 
