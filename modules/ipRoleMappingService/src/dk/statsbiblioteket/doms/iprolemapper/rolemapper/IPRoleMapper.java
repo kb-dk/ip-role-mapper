@@ -27,6 +27,7 @@
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,12 +39,14 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import dk.statsbiblioteket.doms.iprolemapper.utils.SortedList;
+
 /**
  * The <code>IPRoleMapper</code> is capable of associating a number of roles
  * with an IP address based on a number of IP address ranges, which again are
  * associated with a number of roles.
  * 
- * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
+ * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
 public class IPRoleMapper {
 
@@ -119,7 +122,7 @@ public class IPRoleMapper {
 
     /**
      * Get a set of address ranges associated with the role names specified by
-     * <code>roles</code>.
+     * <code>roles</code>. Any overlapping ranges will be merged.
      * 
      * @param roles
      *            a set of role names to find associated address ranges for.
@@ -131,9 +134,11 @@ public class IPRoleMapper {
             log.trace("mapRoles(): Called with roles: " + roles);
         }
 
-        // Collect all the ranges associated with the roles specified. Use a set
-        // to eliminate duplicate IPRange objects.
-        final Set<IPRange> associatedRanges = new HashSet<IPRange>();
+        // Collect all the ranges associated with the roles specified. The
+        // sorted list will keep the IPRange objects ordered in a non-descending
+        // order.
+        final SortedList<IPRange> associatedRanges = new SortedList<IPRange>(
+                new IPRangeComparator());
         for (String role : roles) {
             final List<IPRange> associatedRoleRanges = roleIPRangeMapList
                     .get(role);
@@ -142,13 +147,85 @@ public class IPRoleMapper {
             }
         }
 
+        // Now iterate through all the ranges, merge any overlapping ranges and
+        // remove any redundant ranges.
+
+        final Set<IPRange> mergedRanges = new HashSet<IPRange>();
+        while (associatedRanges.isEmpty() == false) {
+            final IPRange lowestRange = associatedRanges.get(0);
+
+            // Remove all occurrences of the lowest range as it will be
+            // collected under any circumstances.
+            associatedRanges.removeAll(Arrays.asList(lowestRange));
+
+            IPRange neighbourRange = null;
+            if (associatedRanges.isEmpty() == false) {
+                neighbourRange = associatedRanges.get(0);
+            }
+
+            if ((neighbourRange == null)
+                    || (lowestRange.overlaps(neighbourRange) == false)) {
+
+                // No more ranges or they do not overlap. Done...
+                mergedRanges.add(lowestRange);
+            } else {
+
+                // The ranges overlap each other. Merge them and any
+                // subsequently overlapping ranges.
+                IPRange mergedRange = lowestRange;
+                while ((associatedRanges.isEmpty() == false)
+                        && mergedRange.overlaps(neighbourRange)) {
+
+                    // Remove all occurrences of the overlapping neighbour
+                    // range.
+                    associatedRanges.removeAll(Arrays.asList(neighbourRange));
+
+                    // Update the merged range.
+                    mergedRange = mergedRange.merge(neighbourRange);
+
+                    // Prepare testing the next neighbour if there is any.
+                    if (associatedRanges.isEmpty() == false) {
+                        neighbourRange = associatedRanges.get(0);
+                    }
+                }
+                mergedRanges.add(mergedRange);
+            }
+        }
+
         if (log.isTraceEnabled()) {
             log.trace("mapRoles(): Returning IP address ranges: "
                     + associatedRanges);
         }
 
-        return associatedRanges;
+        return mergedRanges;
     }
+
+    // FIXME! Old implementation - KILL!
+    //
+    // public Set<IPRange> mapRoles(Set<String> roles) {
+    //
+    // if (log.isTraceEnabled()) {
+    // log.trace("mapRoles(): Called with roles: " + roles);
+    // }
+    //
+    // // Collect all the ranges associated with the roles specified. Use a set
+    // // to eliminate duplicate IPRange objects.
+    // final Set<IPRange> associatedRanges = new HashSet<IPRange>();
+    // for (String role : roles) {
+    // final List<IPRange> associatedRoleRanges = roleIPRangeMapList
+    // .get(role);
+    // if (associatedRoleRanges != null) {
+    // associatedRanges.addAll(associatedRoleRanges);
+    // }
+    // }
+    //
+    // if (log.isTraceEnabled()) {
+    // log.trace("mapRoles(): Returning IP address ranges: "
+    // + associatedRanges);
+    // }
+    //
+    // return associatedRanges;
+    // }
 
     /**
      * (re-)initialise the internal database over IP ranges and roles. This

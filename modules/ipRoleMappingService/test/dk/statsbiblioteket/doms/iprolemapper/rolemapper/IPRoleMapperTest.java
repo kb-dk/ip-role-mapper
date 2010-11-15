@@ -27,7 +27,6 @@
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -102,9 +101,9 @@ public class IPRoleMapperTest {
     }
 
     /**
-     * Test method for
-     * {@link dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper#mapRoles(Set<String>)}
-     * .
+     * Test method for {@link
+     * dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper#mapRoles(
+     * Set<String>)} .
      * 
      * @throws UnknownHostException
      *             if any of the hard-coded IP addresses are illegal. This will
@@ -112,10 +111,21 @@ public class IPRoleMapperTest {
      */
     @Test
     public void testMapRoles() throws UnknownHostException {
-        fail("Implement this test.");
+        String roleArray[] = { "public", "student", "professor" };
+        final Set<String> rolesToMap = new HashSet<String>(Arrays
+                .asList(roleArray));
+
+        final Set<IPRange> mappedRanges = ipRoleMapper.mapRoles(rolesToMap);
+
+        final Set<IPRange> expectedRanges = new HashSet<IPRange>();
+        final InetAddress beginAddress = InetAddress.getByName("192.168.0.1");
+        final InetAddress endAddress = InetAddress.getByName("192.168.0.254");
+        expectedRanges.add(new IPRange(beginAddress, endAddress));
+        assertEquals(expectedRanges, mappedRanges);
     }
-    
-    private List<IPRangeRoles> createIPv4TestRanges() throws UnknownHostException {
+
+    private List<IPRangeRoles> createIPv4TestRanges()
+            throws UnknownHostException {
 
         // Note: It is important that the sub-arrays in rangeSetups contain a
         // begin address, an end address and at least one role!
@@ -134,8 +144,8 @@ public class IPRoleMapperTest {
             final List<String> roles = Arrays.asList(Arrays.copyOfRange(
                     rangeSetup, 2, rangeSetup.length));
 
-            final IPRangeRoles testRange = new IPRangeRoles(beginAddress, endAddress,
-                    roles);
+            final IPRangeRoles testRange = new IPRangeRoles(beginAddress,
+                    endAddress, roles);
 
             ipRanges.add(testRange);
         }
