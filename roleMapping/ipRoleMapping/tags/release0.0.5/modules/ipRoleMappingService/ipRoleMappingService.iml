@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module relativePaths="true" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Jersey + jsr311">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jersey-1.3/jars/jersey-bundle-1.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jersey-1.3/jars/jsr311-api-1.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jersey-1.3/jars/jersey-multipart-1.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jersey-1.3/jars/asm-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jersey-1.3/source/jersey-multipart-1.3-sources.zip!/" />
+          <root url="jar://$MODULE_DIR$/lib/jersey-1.3/source/jsr311-api-1.1.1-sources.zip!/" />
+          <root url="jar://$MODULE_DIR$/lib/jersey-1.3/source/jersey-bundle-1.3-sources.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="commons-logging" level="project" />
+    <orderEntry type="library" name="domsutils" level="project" />
+    <orderEntry type="library" name="servlet api" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/junit-4.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="sbutil" level="project" />
+  </component>
+</module>
+
