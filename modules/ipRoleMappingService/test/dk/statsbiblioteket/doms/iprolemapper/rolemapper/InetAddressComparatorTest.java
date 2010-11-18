@@ -39,13 +39,13 @@ import org.junit.Test;
  */
 public class InetAddressComparatorTest {
 
-    InetAddress lowIPv4Address;
-    InetAddress lowIPv4AddressClone;
-    InetAddress highIPv4Address;
+    private InetAddress lowIPv4Address;
+    private InetAddress lowIPv4AddressClone;
+    private InetAddress highIPv4Address;
 
-    InetAddress lowIPv6Address;
-    InetAddress lowIPv6AddressClone;
-    InetAddress highIPv6Address;
+    private InetAddress lowIPv6Address;
+    private InetAddress lowIPv6AddressClone;
+    private InetAddress highIPv6Address;
 
     /**
      * @throws java.lang.Exception
