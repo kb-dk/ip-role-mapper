@@ -200,32 +200,16 @@ public class IPRoleMapper {
         return mergedRanges;
     }
 
-    // FIXME! Old implementation - KILL!
-    //
-    // public Set<IPRange> mapRoles(Set<String> roles) {
-    //
-    // if (log.isTraceEnabled()) {
-    // log.trace("mapRoles(): Called with roles: " + roles);
-    // }
-    //
-    // // Collect all the ranges associated with the roles specified. Use a set
-    // // to eliminate duplicate IPRange objects.
-    // final Set<IPRange> associatedRanges = new HashSet<IPRange>();
-    // for (String role : roles) {
-    // final List<IPRange> associatedRoleRanges = roleIPRangeMapList
-    // .get(role);
-    // if (associatedRoleRanges != null) {
-    // associatedRanges.addAll(associatedRoleRanges);
-    // }
-    // }
-    //
-    // if (log.isTraceEnabled()) {
-    // log.trace("mapRoles(): Returning IP address ranges: "
-    // + associatedRanges);
-    // }
-    //
-    // return associatedRanges;
-    // }
+    /**
+     * Test whether this <code>IPRoleMapper</code> currently contains any
+     * mapping information.
+     * 
+     * @return <code>true</code> if this <code>IPRoleMapper</code> does not
+     *         contain any mapping information and otherwise <code>false</code>.
+     */
+    public boolean isEmpty() {
+        return startAddrRangeMapList.isEmpty();
+    }
 
     /**
      * (re-)initialise the internal database over IP ranges and roles. This
