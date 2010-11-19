@@ -26,37 +26,48 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator;
 import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 import dk.statsbiblioteket.util.Logs;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.ws.rs.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.*;
-
-//import dk.statsbiblioteket.doms.webservices.ConfigCollection;
-//
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
-//import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
- * @author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
+ * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
 @Path("/")
 public class IPRoleMapperService {
 
     private static final Log log = LogFactory.getLog(IPRoleMapperService.class);
+    private static final String IP_RANGE_ROLE_CONFIGURATION_PROPERTY = "dk.statsbiblioteket.iprolemapping.configurationFile";
+    private static final String STATUS_ERROR = "ERROR";
+    private static final String STATUS_WARNING = "WARNING";
+    private static final String STATUS_OK = "OK";
     private static long latestConfigFileModificationTime = -1;
+    private static String currentConfigurationFilePath = null;
     private static String lastConfigurationFilePath = "";
+    private static String lastConfigurationReloadStatusMessage = "No configuration loaded.";
+    private static String lastConfigurationReloadStatus = STATUS_OK;
 
     // @Context
     // private HttpServletRequest request;
@@ -99,7 +110,7 @@ public class IPRoleMapperService {
             }// end-while
 
             log.debug("IPRoleMapperService.getRoles(): returning roles: "
-                      + rolesString);
+                    + rolesString);
 
             return rolesString;
         } catch (Throwable throwable) {
@@ -143,7 +154,7 @@ public class IPRoleMapperService {
                 } else {
                     // It's an actual range...
                     rangesString += beginAddress.getHostAddress() + "-"
-                                    + endAddress.getHostAddress();
+                            + endAddress.getHostAddress();
                 }
 
                 // Append a comma if there are more roles left.
@@ -162,6 +173,37 @@ public class IPRoleMapperService {
     }
 
     /**
+     * Simple status service which informs about the current state of the ip
+     * role mapper service. If the reported status is <code>ERROR</code> then
+     * the service is not working at all. If the status is <code>WARNING</code>
+     * then the service has been unable to update its configuration and is still
+     * using the last known good configuration. The <code>OK</code> status
+     * indicates that everything is OK.
+     * 
+     * @return <code>String</code> containing a description of the current state
+     *         of this service.
+     * @throws Throwable
+     *             if anything unexpected happens.
+     */
+    @GET
+    @Path("status")
+    @Produces("text/plain")
+    public String getStatus() throws Throwable {
+
+        log.trace("getStatus(): Entered.");
+
+        verifyConfiguration();
+
+        final String statusMessage = "STATUS: " + lastConfigurationReloadStatus
+                + "\n\nMESSAGE: " + lastConfigurationReloadStatusMessage
+                + "\n\nCurrently using this configuration: "
+                + currentConfigurationFilePath;
+
+        log.debug("getStatus(): Returning: " + statusMessage);
+        return statusMessage;
+    }
+
+    /**
      * Check whether the IP ranges configuration has changed since last
      * initialisation, and if so, then re-initialise IPRoleMapper.
      * <p/>
@@ -176,17 +218,25 @@ public class IPRoleMapperService {
         // ConfigContextListener otherwise this will go very, very wrong.
         final Properties configuration = ConfigCollection.getProperties();
 
-        final String rangesConfigLocation = configuration.getProperty
-                ("dk.statsbiblioteket.iprolemapping.configurationFile");
+        final String rangesConfigLocation = configuration
+                .getProperty(IP_RANGE_ROLE_CONFIGURATION_PROPERTY);
 
         if (log.isTraceEnabled()) {
             log.trace("IPRoleMapperService(): About to load a configuration "
-                      + "from this location: " + rangesConfigLocation);
+                    + "from this location: " + rangesConfigLocation);
         }
 
         if (rangesConfigLocation == null || rangesConfigLocation.length() == 0) {
-            throw new IllegalArgumentException("The location of the IP address"
-                                               + " ranges configuration has not been specified.");
+            final String errorMessage = "The location of the IP address ranges"
+                    + " configuration has not been specified in the '"
+                    + IP_RANGE_ROLE_CONFIGURATION_PROPERTY
+                    + "' property in theservice/server configuration.";
+
+            lastConfigurationReloadStatusMessage = errorMessage;
+            lastConfigurationFilePath = rangesConfigLocation;
+            lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? STATUS_ERROR
+                    : STATUS_WARNING;
+            throw new IllegalArgumentException(errorMessage);
         }
 
         File rangesConfigFile = new File(rangesConfigLocation);
@@ -199,36 +249,62 @@ public class IPRoleMapperService {
                         .getServletContext().getRealPath(rangesConfigLocation));
 
                 if (!rangesConfigFile.exists()) {
-                    throw new FileNotFoundException("Could not locate the "
-                                                    + "configuration file on the file system or within"
-                                                    + " this WAR: " + rangesConfigLocation);
+
+                    final String errorMessage = "Could not locate the "
+                            + "configuration file on the file system or within"
+                            + " the service WAR file: " + rangesConfigLocation;
+
+                    lastConfigurationReloadStatusMessage = errorMessage;
+                    lastConfigurationFilePath = rangesConfigLocation;
+                    lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? STATUS_ERROR
+                            : STATUS_WARNING;
+                    throw new FileNotFoundException(errorMessage);
                 }
             }
 
+            // Check if the file path or modification time has changed since
+            // last initialisation.
             if ((rangesConfigFile.lastModified() != latestConfigFileModificationTime)
-                || (!lastConfigurationFilePath.equals(rangesConfigFile
-                    .getAbsolutePath()))) {
+                    || (!lastConfigurationFilePath.equals(rangesConfigFile
+                            .getAbsolutePath()))) {
 
+                lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
                 latestConfigFileModificationTime = rangesConfigFile
                         .lastModified();
-                lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
 
                 Logs.log(log, Logs.Level.INFO, "IP ranges configuration has "
-                                               + "changed. Re-initialising from file: ",
-                         lastConfigurationFilePath);
+                        + "changed. Re-initialising from file: ",
+                        lastConfigurationFilePath);
+
                 // The configuration has changed. Re-initialise.
                 final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
                 final List<IPRangeRoles> ranges = rangesReader
                         .readFromXMLConfigFile(rangesConfigFile);
                 IPRoleMapper.init(ranges);
+
+                lastConfigurationReloadStatus = STATUS_OK;
+                lastConfigurationReloadStatusMessage = "Running normally.";
+                currentConfigurationFilePath = rangesConfigFile
+                        .getAbsolutePath();
             }
         } catch (IOException ioException) {
-            // intentionally ignoring this exception.
-            log.warn("verifyConfiguration(): Failed (re-)initialising "
-                     + "configuration. Will proceed with the current "
-                     + "configuration. The failing configuration file is: "
-                     + rangesConfigFile, ioException);
+            // Intentionally ignoring/logging this exception. The service will
+            // just continue using the last known good configuration or wait for
+            // the configuration to be fixed.
+            final String errorMessage = "Failed (re-)initialising "
+                    + "configuration. Will proceed with the current "
+                    + "configuration. The failing configuration file is: "
+                    + rangesConfigFile;
+
+            lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? STATUS_ERROR
+                    : STATUS_WARNING;
+
+            lastConfigurationReloadStatusMessage = errorMessage
+                    + " Cause of the failure: " + ioException;
+            log.warn("verifyConfiguration(): " + errorMessage, ioException);
         }
-        log.trace("verifyConfiguration(): Exiting.");
+
+        log.trace("verifyConfiguration(): Exiting. Current re-load status: "
+                + lastConfigurationReloadStatus);
     }
 }

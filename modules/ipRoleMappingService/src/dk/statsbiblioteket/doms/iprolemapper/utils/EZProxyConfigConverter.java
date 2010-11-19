@@ -49,8 +49,7 @@ import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.util.xml.DOM;
 
 /**
- *@author &lt;tsh@statsbiblioteket.dk&gt; Thomas Skou Hansen
- * 
+ * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
 public class EZProxyConfigConverter {
 
