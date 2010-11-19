@@ -7,11 +7,6 @@
     <description>Map an IP address to a DOMS role</description>
 
     <context-param>
-        <param-name>log4jConfigLocation</param-name>
-        <param-value>/WEB-INF/log4j.xml</param-value>
-    </context-param>
-
-    <context-param>
         <param-name>dk.statsbiblioteket.iprolemapping.configurationFile</param-name>
         <param-value>/WEB-INF/ipRangesAndRoles.xml</param-value>
     </context-param>
