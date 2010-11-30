@@ -26,31 +26,22 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator;
 import dk.statsbiblioteket.doms.webservices.ConfigCollection;
 import dk.statsbiblioteket.util.Logs;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.xml.DOMConfigurator;
+
+import javax.ws.rs.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.*;
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
@@ -68,6 +59,26 @@ public class IPRoleMapperService {
     private static String lastConfigurationFilePath = "";
     private static String lastConfigurationReloadStatusMessage = "No configuration loaded.";
     private static String lastConfigurationReloadStatus = STATUS_OK;
+
+    static {
+        String log4jconfigLocation
+                = ConfigCollection.getProperties().getProperty("log4jconfig");
+        if (log4jconfigLocation != null){
+            File configFile = new File(log4jconfigLocation);
+            if (configFile.canRead()){
+                DOMConfigurator.configure(configFile.getAbsolutePath());
+            } else {
+                // The file could not be found, either because the path is not
+                // an absolute path or because it does not exist. Now try
+                // locating it within the WAR file before giving up.
+                configFile = new File(ConfigCollection
+                        .getServletContext().getRealPath(log4jconfigLocation));
+                DOMConfigurator.configure(configFile.getAbsolutePath());
+            }
+        } else {
+            log.error("Failed to load log4jconfig parameter");
+        }
+    }
 
     // @Context
     // private HttpServletRequest request;
@@ -110,7 +121,7 @@ public class IPRoleMapperService {
             }// end-while
 
             log.debug("IPRoleMapperService.getRoles(): returning roles: "
-                    + rolesString);
+                      + rolesString);
 
             return rolesString;
         } catch (Throwable throwable) {
@@ -154,7 +165,7 @@ public class IPRoleMapperService {
                 } else {
                     // It's an actual range...
                     rangesString += beginAddress.getHostAddress() + "-"
-                            + endAddress.getHostAddress();
+                                    + endAddress.getHostAddress();
                 }
 
                 // Append a comma if there are more roles left.
@@ -179,7 +190,7 @@ public class IPRoleMapperService {
      * then the service has been unable to update its configuration and is still
      * using the last known good configuration. The <code>OK</code> status
      * indicates that everything is OK.
-     * 
+     *
      * @return <code>String</code> containing a description of the current state
      *         of this service.
      * @throws Throwable
@@ -195,9 +206,9 @@ public class IPRoleMapperService {
         verifyConfiguration();
 
         final String statusMessage = "STATUS: " + lastConfigurationReloadStatus
-                + "\n\nMESSAGE: " + lastConfigurationReloadStatusMessage
-                + "\n\nCurrently using this configuration: "
-                + currentConfigurationFilePath;
+                                     + "\n\nMESSAGE: " + lastConfigurationReloadStatusMessage
+                                     + "\n\nCurrently using this configuration: "
+                                     + currentConfigurationFilePath;
 
         log.debug("getStatus(): Returning: " + statusMessage);
         return statusMessage;
@@ -223,19 +234,19 @@ public class IPRoleMapperService {
 
         if (log.isTraceEnabled()) {
             log.trace("IPRoleMapperService(): About to load a configuration "
-                    + "from this location: " + rangesConfigLocation);
+                      + "from this location: " + rangesConfigLocation);
         }
 
         if (rangesConfigLocation == null || rangesConfigLocation.length() == 0) {
             final String errorMessage = "The location of the IP address ranges"
-                    + " configuration has not been specified in the '"
-                    + IP_RANGE_ROLE_CONFIGURATION_PROPERTY
-                    + "' property in theservice/server configuration.";
+                                        + " configuration has not been specified in the '"
+                                        + IP_RANGE_ROLE_CONFIGURATION_PROPERTY
+                                        + "' property in theservice/server configuration.";
 
             lastConfigurationReloadStatusMessage = errorMessage;
             lastConfigurationFilePath = rangesConfigLocation;
             lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? STATUS_ERROR
-                    : STATUS_WARNING;
+                                                                                   : STATUS_WARNING;
             throw new IllegalArgumentException(errorMessage);
         }
 
@@ -251,13 +262,13 @@ public class IPRoleMapperService {
                 if (!rangesConfigFile.exists()) {
 
                     final String errorMessage = "Could not locate the "
-                            + "configuration file on the file system or within"
-                            + " the service WAR file: " + rangesConfigLocation;
+                                                + "configuration file on the file system or within"
+                                                + " the service WAR file: " + rangesConfigLocation;
 
                     lastConfigurationReloadStatusMessage = errorMessage;
                     lastConfigurationFilePath = rangesConfigLocation;
                     lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? STATUS_ERROR
-                            : STATUS_WARNING;
+                                                                                           : STATUS_WARNING;
                     throw new FileNotFoundException(errorMessage);
                 }
             }
@@ -265,16 +276,16 @@ public class IPRoleMapperService {
             // Check if the file path or modification time has changed since
             // last initialisation.
             if ((rangesConfigFile.lastModified() != latestConfigFileModificationTime)
-                    || (!lastConfigurationFilePath.equals(rangesConfigFile
-                            .getAbsolutePath()))) {
+                || (!lastConfigurationFilePath.equals(rangesConfigFile
+                    .getAbsolutePath()))) {
 
                 lastConfigurationFilePath = rangesConfigFile.getAbsolutePath();
                 latestConfigFileModificationTime = rangesConfigFile
                         .lastModified();
 
                 Logs.log(log, Logs.Level.INFO, "IP ranges configuration has "
-                        + "changed. Re-initialising from file: ",
-                        lastConfigurationFilePath);
+                                               + "changed. Re-initialising from file: ",
+                         lastConfigurationFilePath);
 
                 // The configuration has changed. Re-initialise.
                 final IPRangesConfigReader rangesReader = new IPRangesConfigReader();
@@ -292,19 +303,19 @@ public class IPRoleMapperService {
             // just continue using the last known good configuration or wait for
             // the configuration to be fixed.
             final String errorMessage = "Failed (re-)initialising "
-                    + "configuration. Will proceed with the current "
-                    + "configuration. The failing configuration file is: "
-                    + rangesConfigFile;
+                                        + "configuration. Will proceed with the current "
+                                        + "configuration. The failing configuration file is: "
+                                        + rangesConfigFile;
 
             lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? STATUS_ERROR
-                    : STATUS_WARNING;
+                                                                                   : STATUS_WARNING;
 
             lastConfigurationReloadStatusMessage = errorMessage
-                    + " Cause of the failure: " + ioException;
+                                                   + " Cause of the failure: " + ioException;
             log.warn("verifyConfiguration(): " + errorMessage, ioException);
         }
 
         log.trace("verifyConfiguration(): Exiting. Current re-load status: "
-                + lastConfigurationReloadStatus);
+                  + lastConfigurationReloadStatus);
     }
 }
