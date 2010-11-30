@@ -312,6 +312,15 @@
         <root url="jar://$PROJECT_DIR$/lib/sbutil-0.5.2/src/sbutil-0.5.2-src.zip!/sbutil-0.5.2/src" />
       </SOURCES>
     </library>
+    <library name="log4j">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.15/jars/log4j-1.2.15.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.15/src/log4j-1.2.15-src.zip!/" />
+      </SOURCES>
+    </library>
   </component>
 </project>
 
