@@ -3,23 +3,30 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-    <display-name>IPAddressRoleMapper</display-name>
-    <description>Map an IP address to a DOMS role</description>
-
-    <context-param>
-        <param-name>log4jconfig</param-name>
-        <param-value>/WEB-INF/log4jproperties.xml</param-value>
-    </context-param>
+    <display-name>IP Address To Role Mapper</display-name>
+    <description>This service can map an IP address to one or more roles, or map a set of roles to a set of IP addresses / address ranges.</description>
 
     <context-param>
         <param-name>dk.statsbiblioteket.iprolemapping.configurationFile</param-name>
-        <param-value>/WEB-INF/ipRangesAndRoles.xml</param-value>
+        <param-value>WEB-INF/ipRangesAndRoles.xml</param-value>
     </context-param>
 
     <listener>
         <listener-class>
             dk.statsbiblioteket.doms.webservices.ConfigContextListener</listener-class>
     </listener>
+
+    <servlet>
+        <servlet-name>Log4jInitialisation</servlet-name>
+        <servlet-class>dk.statsbiblioteket.doms.iprolemapper.servlets.Log4JInitServlet</servlet-class>
+
+        <init-param>
+            <param-name>
+                dk.statsbiblioteket.doms.iprolemapper.servlets.Log4JInitServlet.log4jConfigurationPropertyKey</param-name>
+            <param-value>dk.statsbiblioteket.doms.iprolemapper.log4jConfigurationFilePath</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
     <servlet>
         <servlet-name>IPAddressRoleMapper</servlet-name>
@@ -29,6 +36,7 @@
             <param-value>dk.statsbiblioteket.doms.iprolemapper.webservice</param-value>
         </init-param>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>IPAddressRoleMapper</servlet-name>
         <url-pattern>/*</url-pattern>
