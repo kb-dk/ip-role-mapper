@@ -36,7 +36,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 
 /**
  * This servlet will look up the servlet init-param key called <code>
- * &quot;&lt;this package name&gt;.&lt;this class name&gt;.loglog4jConfigurationPropertyKey&quot;
+ * &quot;&lt;full package name of the package containing this servlet&gt;.&lt;the name of this servlet class&gt;.loglog4jConfigurationPropertyKey&quot;
  * </code> to obtain
  * the context-parameter key which has been assiged with the file path to an XML
  * log4j configuration (that is <b>not</b> a <code>.properties</code> file), and
@@ -48,23 +48,27 @@ import org.apache.log4j.xml.DOMConfigurator;
  * <pre>
  *     &lt;servlet&gt;
  *         &lt;servlet-name&gt;Log4jInitialisation&lt;/servlet-name&gt;
- *         &lt;servlet-class&gt;full.package.name.to.Log4JInitServlet&lt;/servlet-class&gt;
+ *         &lt;servlet-class&gt;
+ *             the.canonical.name.of.Log4JInitServlet
+ *         &lt;/servlet-class&gt;
  * 
  *         &lt;init-param&gt;
  *             &lt;param-name&gt;
- *                 must.be.full.package.name.of.the.package.containing.Log4JInitServlet.appended.with.log4jConfigurationPropertyKey&lt;/param-name&gt;
- *             &lt;param-value&gt;full.package.name.to.your.web-app.plus.a.name.of.your.choice.eg.log4jConfigurationFilePath&lt;/param-value&gt;
+ *                 &quot;the cannonical class name of Log4JInitServlet&quot;.log4jConfigurationPropertyKey
+ *             &lt;/param-name&gt;
+ *             &lt;param-value&gt;
+ *                 context-param key name of your choice. E.g. something like: &quot;fully qualified package name of your web application&quot;.log4jConfigurationFilePath
+ *             &lt;/param-value&gt;
  *         &lt;/init-param&gt;
  *         &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
  *     &lt;/servlet&gt;
  * </pre>
  * <p/>
- * You must declare the above context-param
- * <code>full.package.name.to.your.web-app.plus.a.name.of.your.choice.eg.log4jConfigurationFilePath</code>
- * in the tomcat configuration (eg. in the <code>context.xml</code> file) and
- * assign that with the file path to the log4j configuration, in order to make
- * it all work. This servlet will attempt to log any initialisation issues to
- * the default log provided by the servlet context.
+ * You must assign the above context-param key with the file path to the log4j
+ * configuration in the tomcat configuration (eg. in the
+ * <code>context.xml</code> file) to make it all work. This servlet will attempt
+ * to log any initialisation issues to the default log provided by the servlet
+ * context.
  * 
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
