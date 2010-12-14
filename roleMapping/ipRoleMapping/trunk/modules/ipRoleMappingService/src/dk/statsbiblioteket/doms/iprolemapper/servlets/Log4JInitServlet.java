@@ -38,8 +38,33 @@ import org.apache.log4j.xml.DOMConfigurator;
  * This servlet will look up the servlet init-param key called <code>
  * &quot;&lt;this package name&gt;.&lt;this class name&gt;.loglog4jConfigurationPropertyKey&quot;
  * </code> to obtain
- * the context-parameter key which has been assiged with the file path to a XML
- * log4j configuration, and initialise log4j with that.
+ * the context-parameter key which has been assiged with the file path to an XML
+ * log4j configuration (that is <b>not</b> a <code>.properties</code> file), and
+ * initialise log4j with that.
+ * <p/>
+ * Add a section like the following to your <code>web.xml</code> file in order
+ * to use this servlet to initialise log4j for your web application:
+ * 
+ * <pre>
+ *     &lt;servlet&gt;
+ *         &lt;servlet-name&gt;Log4jInitialisation&lt;/servlet-name&gt;
+ *         &lt;servlet-class&gt;full.package.name.to.Log4JInitServlet&lt;/servlet-class&gt;
+ * 
+ *         &lt;init-param&gt;
+ *             &lt;param-name&gt;
+ *                 must.be.full.package.name.of.the.package.containing.Log4JInitServlet.appended.with.log4jConfigurationPropertyKey&lt;/param-name&gt;
+ *             &lt;param-value&gt;full.package.name.to.your.web-app.plus.a.name.of.your.choice.eg.log4jConfigurationFilePath&lt;/param-value&gt;
+ *         &lt;/init-param&gt;
+ *         &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+ *     &lt;/servlet&gt;
+ * </pre>
+ * <p/>
+ * You must declare the above context-param
+ * <code>full.package.name.to.your.web-app.plus.a.name.of.your.choice.eg.log4jConfigurationFilePath</code>
+ * in the tomcat configuration (eg. in the <code>context.xml</code> file) and
+ * assign that with the file path to the log4j configuration, in order to make
+ * it all work. This servlet will attempt to log any initialisation issues to
+ * the default log provided by the servlet context.
  * 
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
@@ -51,29 +76,19 @@ public class Log4JInitServlet extends HttpServlet {
 
         final String className = getClass().getName();
 
-        final String log4jConfigurationPropertyKey = className
-                + ".log4jConfigurationPropertyKey";
-
-        getServletContext().log(
-                className + ".init(): Fetching the log4j configuration file "
-                        + "path parameter key assigned to the parameter key:"
-                        + log4jConfigurationPropertyKey);
-
-        final String log4jConfigurationPathKey = getInitParameter(log4jConfigurationPropertyKey);
-
-        getServletContext().log(
-                className + ".init(): Looking up the log4j configuration file"
-                        + " path assigned to the context parameter key '"
-                        + log4jConfigurationPathKey + "'.");
-
-        final String log4jconfigPath = getServletContext().getInitParameter(
-                log4jConfigurationPathKey);
-
-        getServletContext().log(
-                className + ".init(): About to load the log4j configuration "
-                        + "file: " + log4jconfigPath);
+        String log4jConfigurationPropertyKey = null;
+        String log4jConfigurationPathKey = null;
+        String log4jconfigPath = null;
 
         try {
+            log4jConfigurationPropertyKey = className
+                    + ".log4jConfigurationPropertyKey";
+
+            log4jConfigurationPathKey = getInitParameter(log4jConfigurationPropertyKey);
+
+            log4jconfigPath = getServletContext().getInitParameter(
+                    log4jConfigurationPathKey);
+
             // Attempt reading from the file system.
             File configFile = new File(log4jconfigPath);
             if (!configFile.exists()) {
@@ -87,8 +102,10 @@ public class Log4JInitServlet extends HttpServlet {
 
             getServletContext().log(
                     className + ".init(): Successfully initialised log4j, "
-                            + "using the configuration file: "
-                            + log4jconfigPath);
+                            + "using the configuration file: '"
+                            + configFile.getAbsolutePath()
+                            + "' specified by the context-param: "
+                            + log4jConfigurationPathKey);
         } catch (RuntimeException runtimeException) {
             // The above code throws no checked exceptions, however, make sure
             // that no runtime exceptions goes by unnoticed.
@@ -102,7 +119,6 @@ public class Log4JInitServlet extends HttpServlet {
                             + "' and the configuration file path specified by "
                             + "that was: '" + log4jconfigPath + "'.",
                     runtimeException);
-            throw runtimeException;
         }
     }
 
