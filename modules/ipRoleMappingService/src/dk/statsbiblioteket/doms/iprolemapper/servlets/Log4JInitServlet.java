@@ -75,7 +75,6 @@ public class Log4JInitServlet extends HttpServlet {
     public void init() {
 
         final String className = getClass().getName();
-
         String log4jConfigurationPropertyKey = null;
         String log4jConfigurationPathKey = null;
         String log4jconfigPath = null;
@@ -98,6 +97,8 @@ public class Log4JInitServlet extends HttpServlet {
                 configFile = new File(getServletContext().getRealPath(
                         log4jconfigPath));
             }
+
+            // Load or die...
             DOMConfigurator.configure(configFile.getAbsolutePath());
 
             getServletContext().log(
@@ -106,9 +107,9 @@ public class Log4JInitServlet extends HttpServlet {
                             + configFile.getAbsolutePath()
                             + "' specified by the context-param: "
                             + log4jConfigurationPathKey);
+
         } catch (RuntimeException runtimeException) {
-            // The above code throws no checked exceptions, however, make sure
-            // that no runtime exceptions goes by unnoticed.
+
             getServletContext().log(
                     className + ".init(): Failed configuring log4j. The "
                             + "configuration file path context parameter key "
