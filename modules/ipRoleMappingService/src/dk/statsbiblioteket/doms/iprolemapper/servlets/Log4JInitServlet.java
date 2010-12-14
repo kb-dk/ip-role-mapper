@@ -78,6 +78,7 @@ public class Log4JInitServlet extends HttpServlet {
         String log4jConfigurationPropertyKey = null;
         String log4jConfigurationPathKey = null;
         String log4jconfigPath = null;
+        File configFile = null;
 
         try {
             log4jConfigurationPropertyKey = className
@@ -89,7 +90,7 @@ public class Log4JInitServlet extends HttpServlet {
                     log4jConfigurationPathKey);
 
             // Attempt reading from the file system.
-            File configFile = new File(log4jconfigPath);
+            configFile = new File(log4jconfigPath);
             if (!configFile.exists()) {
                 // The file could not be found, either because the path is not
                 // an absolute path or because it does not exist. Now try
@@ -101,25 +102,22 @@ public class Log4JInitServlet extends HttpServlet {
             // Load or die...
             DOMConfigurator.configure(configFile.getAbsolutePath());
 
-            getServletContext().log(
-                    className + ".init(): Successfully initialised log4j, "
-                            + "using the configuration file: '"
-                            + configFile.getAbsolutePath()
-                            + "' specified by the context-param: "
-                            + log4jConfigurationPathKey);
+            log(className + ".init(): Successfully initialised log4j, "
+                    + "using the configuration file: '"
+                    + configFile.getAbsolutePath()
+                    + "' specified by the context-param: "
+                    + log4jConfigurationPathKey);
 
         } catch (RuntimeException runtimeException) {
 
-            getServletContext().log(
-                    className + ".init(): Failed configuring log4j. The "
-                            + "configuration file path context parameter key "
-                            + "specified by the '"
-                            + log4jConfigurationPropertyKey
-                            + "' init-parameter key was: '"
-                            + log4jConfigurationPathKey
-                            + "' and the configuration file path specified by "
-                            + "that was: '" + log4jconfigPath + "'.",
-                    runtimeException);
+            log(className + ".init(): Failed configuring log4j. The "
+                    + "configuration file path context parameter key specified"
+                    + " by the '" + log4jConfigurationPropertyKey
+                    + "' init-parameter key was: '" + log4jConfigurationPathKey
+                    + "' and the configuration file path specified by that "
+                    + "was: '" + log4jconfigPath + "'. Actual file path used "
+                    + "for configuration loading: "
+                    + configFile.getAbsolutePath(), runtimeException);
         }
     }
 
