@@ -24,39 +24,31 @@
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
     debug="false">
 
-    <appender name="IPRoleMapperFile" class="org.apache.log4j.FileAppender">
+    <appender name="IPRoleMapperFile" class="org.apache.log4j.RollingFileAppender">
         <param name="Threshold" value="INFO" />
-        <param name="File" value="logs/IPRoleMapper.log" />
+        <param name="File" value="${log.root.dir}/logs/IPRoleMapper.log" />
+        <param name="MaxFileSize" value="10MB" />
+        <param name="MaxBackupIndex" value="10" />
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%-5p [%t] [%d] [%c] %m%n" />
+            <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n" />
         </layout>
     </appender>
 
     <!-- A console appender -->
-    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+    <appender name="Console" class="org.apache.log4j.ConsoleAppender">
         <param name="Threshold" value="ERROR" />
-        <!-- or WARN or DEBUG or INFO -->
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%-5p [%t] [%d] [%c] %m%n" />
-        </layout>
-    </appender>
-
-    <appender name="DomsFile" class="org.apache.log4j.FileAppender">
-        <param name="Threshold" value="INFO" />
-        <param name="File" value="$TESTBED_DIR$/logs/doms.log" />
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%-5p [%t] [%d] [%c] %m%n" />
+            <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n" />
         </layout>
     </appender>
 
     <logger name="dk.statsbiblioteket.doms.iprolemapper">
-        <level value="ALL" />
+        <level value="INFO" />
         <appender-ref ref="IPRoleMapperFile" />
     </logger>
 
     <root>
-        <level value="ALL" />
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="DomsFile" />
+        <level value="ERROR" />
+        <appender-ref ref="Console" />
     </root>
 </log4j:configuration>
