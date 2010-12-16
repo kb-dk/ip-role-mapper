@@ -6,11 +6,6 @@
     <display-name>IP Address To Role Mapper</display-name>
     <description>This service can map an IP address to one or more roles, or map a set of roles to a set of IP addresses / address ranges.</description>
 
-    <context-param>
-        <param-name>dk.statsbiblioteket.iprolemapping.configurationFile</param-name>
-        <param-value>WEB-INF/ipRangesAndRoles.xml</param-value>
-    </context-param>
-
     <listener>
         <listener-class>
             dk.statsbiblioteket.doms.webservices.configuration.ConfigContextListener</listener-class>

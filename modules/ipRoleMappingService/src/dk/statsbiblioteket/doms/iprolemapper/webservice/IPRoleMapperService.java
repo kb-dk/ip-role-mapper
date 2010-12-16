@@ -59,7 +59,7 @@ public class IPRoleMapperService {
 
     private static final Log log = LogFactory.getLog(IPRoleMapperService.class);
 
-    private static final String IP_RANGE_ROLE_CONFIGURATION_PROPERTY = "dk.statsbiblioteket.iprolemapping.configurationFile";
+    private static final String IP_RANGE_ROLE_CONFIGURATION_PROPERTY = "dk.statsbiblioteket.doms.iprolemapper.webservice.IPRoleMapperService.configurationFile";
     private static long latestConfigFileModificationTime = -1;
     private static String currentConfigurationFilePath = null;
     private static String lastConfigurationFilePath = "";
