@@ -13,16 +13,16 @@
 
     <listener>
         <listener-class>
-            dk.statsbiblioteket.doms.webservices.ConfigContextListener</listener-class>
+            dk.statsbiblioteket.doms.webservices.configuration.ConfigContextListener</listener-class>
     </listener>
 
     <servlet>
         <servlet-name>Log4jInitialisation</servlet-name>
-        <servlet-class>dk.statsbiblioteket.doms.iprolemapper.servlets.Log4JInitServlet</servlet-class>
+        <servlet-class>dk.statsbiblioteket.doms.webservices.logging.Log4JInitServlet</servlet-class>
 
         <init-param>
             <param-name>
-                dk.statsbiblioteket.doms.iprolemapper.servlets.Log4JInitServlet.log4jConfigurationPropertyKey</param-name>
+                dk.statsbiblioteket.doms.webservices.logging.Log4JInitServlet.log4jConfigurationPropertyKey</param-name>
             <param-value>dk.statsbiblioteket.doms.iprolemapper.log4jConfigurationFilePath</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
