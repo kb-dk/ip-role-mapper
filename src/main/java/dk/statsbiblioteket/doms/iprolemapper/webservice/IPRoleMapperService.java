@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -49,7 +48,6 @@ import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRange;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRoleMapper;
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.InetAddressComparator;
-import dk.statsbiblioteket.doms.webservices.configuration.ConfigCollection;
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
@@ -65,6 +63,8 @@ public class IPRoleMapperService {
     private static String lastConfigurationFilePath = "";
     private static String lastConfigurationReloadStatusMessage = "No configuration loaded.";
     private static Status lastConfigurationReloadStatus = Status.OK;
+    
+    private static String configProperty;
 
     private enum Status {
         OK, WARNING, ERROR
@@ -73,6 +73,11 @@ public class IPRoleMapperService {
     public IPRoleMapperService() {
     }
 
+    public static synchronized void initialiseConfig(String ipRangeProperty) {
+    	configProperty = ipRangeProperty;
+    }
+    
+    
     /*
      * Expected exception: UnknownHostException.
      */
@@ -214,10 +219,8 @@ public class IPRoleMapperService {
 
         // NOTE! Make sure that web.xml has a listener entry for the
         // ConfigContextListener otherwise this will go very, very wrong.
-        final Properties configuration = ConfigCollection.getProperties();
-
-        final String rangesConfigLocation = configuration
-                .getProperty(IP_RANGE_ROLE_CONFIGURATION_PROPERTY);
+        final String rangesConfigLocation = configProperty;
+                
 
         if (log.isTraceEnabled()) {
             log.trace("IPRoleMapperService(): About to load a configuration "
@@ -240,24 +243,14 @@ public class IPRoleMapperService {
         File rangesConfigFile = new File(rangesConfigLocation);
         try {
             if (!rangesConfigFile.exists()) {
-                // The file could not be found, either because the path is not
-                // an absolute path or because it does not exist. Now try
-                // locating it within the WAR file before giving up.
-                rangesConfigFile = new File(ConfigCollection
-                        .getServletContext().getRealPath(rangesConfigLocation));
-
-                if (!rangesConfigFile.exists()) {
-
-                    final String errorMessage = "Could not locate the "
-                            + "configuration file on the file system or within"
-                            + " the service WAR file: " + rangesConfigLocation;
-
-                    lastConfigurationReloadStatusMessage = errorMessage;
-                    lastConfigurationFilePath = rangesConfigLocation;
-                    lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? Status.ERROR
-                            : Status.WARNING;
-                    throw new FileNotFoundException(errorMessage);
-                }
+                final String errorMessage = "Could not locate the "
+                        + "configuration file on the file system: " + rangesConfigLocation;
+ 
+                lastConfigurationReloadStatusMessage = errorMessage;
+                lastConfigurationFilePath = rangesConfigLocation;
+                lastConfigurationReloadStatus = (currentConfigurationFilePath == null) ? Status.ERROR
+                        : Status.WARNING;
+                throw new FileNotFoundException(errorMessage);
             }
 
             // Check if the file path or modification time has changed since

@@ -33,7 +33,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
@@ -49,13 +48,13 @@ public class ServiceExceptionMapper implements ExceptionMapper<Exception> {
         if (exception instanceof UnknownHostException) {
             
             // Complain about an invalid host address.
-            return Response.status(ClientResponse.Status.BAD_REQUEST).entity(
+            return Response.status(Response.Status.BAD_REQUEST).entity(
                     "Could not lookup roles for the requested host. Reason: "
                             + exception.toString()).build();
         } else if (exception instanceof IOException) {
             
             // Complain over a broken service configuration.
-            return Response.status(ClientResponse.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(
                             "Service configuration error: "
                                     + exception.toString()).build();
