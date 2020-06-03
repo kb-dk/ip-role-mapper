@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+    <display-name>IP Address To Role Mapper</display-name>
+    <description>This service can map an IP address to one or more roles, or map a set of roles to a set of IP addresses / address ranges.</description>
+
+    <servlet>
+        <servlet-name>IPAddressRoleMapper</servlet-name>
+        <servlet-class>org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet</servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>dk.statsbiblioteket.doms.webservice.IPRoleMapperApplication</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>IPAddressRoleMapper</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <listener>
+        <listener-class>dk.statsbiblioteket.doms.webservice.IPRoleMapperContextListener</listener-class>
+    </listener>
+
+    <!--
+
+
+    <listener>
+        <listener-class>
+            dk.statsbiblioteket.doms.webservices.configuration.ConfigContextListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>Log4jInitialisation</servlet-name>
+        <servlet-class>dk.statsbiblioteket.doms.webservices.logging.Log4JInitServlet</servlet-class>
+
+        <init-param>
+            <param-name>
+                dk.statsbiblioteket.doms.webservices.logging.Log4JInitServlet.log4jConfigurationPropertyKey</param-name>
+            <param-value>dk.statsbiblioteket.doms.iprolemapper.log4jConfigurationFilePath</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>IPAddressRoleMapper</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>dk.statsbiblioteket.doms.iprolemapper.webservice</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>IPAddressRoleMapper</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>-->
+
+</web-app>
