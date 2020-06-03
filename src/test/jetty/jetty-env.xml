@@ -2,7 +2,7 @@
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
 
     <New id="logback" class="org.eclipse.jetty.plus.jndi.EnvEntry">
-        <Arg>java-webapp-logback-config</Arg>
+        <Arg>ip-rolemapper-logback-config</Arg>
         <Arg type="java.lang.String">
             ${basedir}/target/jetty-res/logback.xml
         </Arg>
@@ -10,9 +10,9 @@
     </New>
 
     <New id="config" class="org.eclipse.jetty.plus.jndi.EnvEntry">
-        <Arg>application-config</Arg>
+        <Arg>ip-ranges-config</Arg>
         <Arg type="java.lang.String">
-            ${basedir}/conf/java-webapp.yaml
+            ${basedir}/conf/ipRangesAndRoles.xml
         </Arg>
         <Arg type="boolean">true</Arg>
     </New>
