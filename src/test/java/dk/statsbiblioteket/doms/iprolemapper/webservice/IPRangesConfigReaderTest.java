@@ -26,8 +26,8 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.webservice;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import dk.statsbiblioteket.doms.iprolemapper.rolemapper.IPRangeRoles;
@@ -69,9 +69,9 @@ public class IPRangesConfigReaderTest {
         final String configFilePath = "config/madstest.xml";
         final URL configURL = ClassLoader.getSystemResource(configFilePath);
 
-        assertNotNull("Cannot locate the test configuration file. Make sure "
+        assertNotNull(configURL, "Cannot locate the test configuration file. Make sure "
                 + "that '" + configFilePath
-                + "' is accessible via the class path.", configURL);
+                + "' is accessible via the class path.");
 
         System.out.println(this.getClass().getName()
                 + ".testReadFromXMLConfigFile(): About to read configuration "
@@ -79,8 +79,7 @@ public class IPRangesConfigReaderTest {
 
         List<IPRangeRoles> ipRanges = configReader
                 .readFromXMLConfigFile(new File(configURL.getFile()));
-        assertEquals(
-                "Un-expected number of IPRange instances were produced from the configuration file.",
-                967, ipRanges.size());
+        assertEquals(967, ipRanges.size(),
+                "Un-expected number of IPRange instances were produced from the configuration file.");
     }
 }

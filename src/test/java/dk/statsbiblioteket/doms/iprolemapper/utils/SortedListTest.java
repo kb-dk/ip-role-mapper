@@ -26,9 +26,7 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +34,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
@@ -63,7 +61,7 @@ public class SortedListTest {
     /**
      * @throws java.lang.Exception
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testList = new SortedList<Integer>(new Comparator<Integer>() {
 
@@ -79,7 +77,7 @@ public class SortedListTest {
     /**
      * @throws java.lang.Exception
      */
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
@@ -175,9 +173,8 @@ public class SortedListTest {
         final Integer testValue = testValues[5];
         final int referenceIndex = Arrays.asList(sortedTestValues).indexOf(
                 testValue);
-        assertEquals("The test value '" + testValue
-                + "' was not found at the expected position.", referenceIndex,
-                testList.indexOf(testValue));
+        assertEquals(referenceIndex, testList.indexOf(testValue),
+        		"The test value '" + testValue + "' was not found at the expected position.");
     }
 
     /**
@@ -223,9 +220,8 @@ public class SortedListTest {
         final Integer testValue = testValues[5];
         final int referenceIndex = Arrays.asList(sortedTestValues).lastIndexOf(
                 testValue);
-        assertEquals("The test value '" + testValue
-                + "' was not found at the expected position.", referenceIndex,
-                testList.lastIndexOf(testValue));
+        assertEquals(referenceIndex, testList.lastIndexOf(testValue),
+        		"The test value '" + testValue + "' was not found at the expected position.");
     }
 
     /**
@@ -241,8 +237,8 @@ public class SortedListTest {
         final Integer testValue = sortedTestValues[referenceIndex];
 
         assertEquals(testValue, testList.get(referenceIndex));
-        assertEquals("An un-expected element value was removed.", testValue,
-                testList.remove(referenceIndex));
+        assertEquals(testValue, testList.remove(referenceIndex),
+        		"An un-expected element value was removed.");
         assertFalse(testValue.equals(testList.get(referenceIndex)));
     }
 
@@ -258,14 +254,11 @@ public class SortedListTest {
         final int referenceIndex = 2;
         final Integer testValue = sortedTestValues[referenceIndex];
 
-        assertEquals("The test value '" + testValue
-                + "' was not found at the expected position.", referenceIndex,
-                testList.indexOf(testValue));
-        assertTrue("The list was expected to change.", testList
-                .remove(testValue));
-        assertFalse("The test value '" + testValue
-                + "' does not seem to be removed from the list.",
-                referenceIndex == testList.indexOf(testValue));
+        assertEquals(referenceIndex, testList.indexOf(testValue),
+        		"The test value '" + testValue + "' was not found at the expected position.");
+        assertTrue(testList.remove(testValue), "The list was expected to change.");
+        assertFalse(referenceIndex == testList.indexOf(testValue), "The test value '" + testValue
+                + "' does not seem to be removed from the list.");
     }
 
     /**
@@ -288,9 +281,8 @@ public class SortedListTest {
 
         // Verify that the removed elements do no longer exist in the list.
         for (Integer removedElement : elementsToRemove) {
-            assertFalse("The removed element '" + removedElement
-                    + "' still exists in the list.", testList
-                    .contains(removedElement));
+            assertFalse(testList.contains(removedElement), "The removed element '" + removedElement
+                    + "' still exists in the list.");
         }
     }
 
@@ -314,9 +306,8 @@ public class SortedListTest {
 
         // Verify that the elements to retain still exist in the list.
         for (Integer retainedElement : elementsToKeep) {
-            assertFalse("The element '" + retainedElement
-                    + "' was not retained in the list.", -1 == testList
-                    .indexOf(retainedElement));
+            assertFalse(-1 == testList.indexOf(retainedElement), 
+            		"The element '" + retainedElement + "' was not retained in the list.");
         }
     }
 

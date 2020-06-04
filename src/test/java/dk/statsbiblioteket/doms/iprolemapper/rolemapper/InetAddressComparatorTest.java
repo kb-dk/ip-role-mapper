@@ -26,13 +26,14 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.InetAddress;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
@@ -50,7 +51,7 @@ public class InetAddressComparatorTest {
     /**
      * @throws java.lang.Exception
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         lowIPv4Address = InetAddress.getByName("10.50.0.42");
         lowIPv4AddressClone = InetAddress.getByName("10.50.0.42");
@@ -72,20 +73,16 @@ public class InetAddressComparatorTest {
     @Test
     public void testCompareIPv4() {
         final InetAddressComparator comparator = new InetAddressComparator();
-        assertEquals(
-                "Failed comparing two similar IPv4 InetAddress instances.", 0,
-                comparator.compare(lowIPv4Address, lowIPv4AddressClone));
-        assertEquals(
-                "Failed comparing an IPv4 InetAddress instances with it self.",
-                0, comparator.compare(lowIPv4Address, lowIPv4Address));
-        assertEquals(
-                "Failed performing a \"less than\" comparison of two IPv4 "
-                        + "InetAddress instances.", -1, comparator.compare(
-                        lowIPv4Address, highIPv4Address));
-        assertEquals(
+        assertEquals(0, comparator.compare(lowIPv4Address, lowIPv4AddressClone), 
+                "Failed comparing two similar IPv4 InetAddress instances.");
+        assertEquals(0, comparator.compare(lowIPv4Address, lowIPv4Address),
+                "Failed comparing an IPv4 InetAddress instances with it self.");
+        assertEquals(-1, comparator.compare(lowIPv4Address, highIPv4Address), 
+        		"Failed performing a \"less than\" comparison of two IPv4 "
+                                + "InetAddress instances.");
+        assertEquals(1, comparator.compare(highIPv4Address, lowIPv4Address), 
                 "Failed performing a \"greater than\" comparison of two IPv4 "
-                        + "InetAddress instances.", 1, comparator.compare(
-                        highIPv4Address, lowIPv4Address));
+                        + "InetAddress instances.");
     }
 
     /**
@@ -96,20 +93,16 @@ public class InetAddressComparatorTest {
     @Test
     public void testCompareIPv6() {
         final InetAddressComparator comparator = new InetAddressComparator();
-        assertEquals(
-                "Failed comparing two similar IPv6 InetAddress instances.", 0,
-                comparator.compare(lowIPv6Address, lowIPv6AddressClone));
-        assertEquals(
-                "Failed comparing an IPv6 InetAddress instances with it self.",
-                0, comparator.compare(lowIPv6Address, lowIPv6Address));
-        assertEquals(
-                "Failed performing a \"less than\" comparison of two IPv6 "
-                        + "InetAddress instances.", -1, comparator.compare(
-                        lowIPv6Address, highIPv6Address));
-        assertEquals(
-                "Failed performing a \"greater than\" comparison of two IPv6 "
-                        + "InetAddress instances.", 1, comparator.compare(
-                        highIPv6Address, lowIPv6Address));
+        assertEquals(0, comparator.compare(lowIPv6Address, lowIPv6AddressClone),
+        		"Failed comparing two similar IPv6 InetAddress instances.");
+        assertEquals(0, comparator.compare(lowIPv6Address, lowIPv6Address), 
+        		"Failed comparing an IPv6 InetAddress instances with it self.");
+        assertEquals(-1, comparator.compare(lowIPv6Address, highIPv6Address), 
+        		"Failed performing a \"less than\" comparison of two IPv6 "
+                        + "InetAddress instances.");
+        assertEquals(1, comparator.compare(highIPv6Address, lowIPv6Address),
+        		"Failed performing a \"greater than\" comparison of two IPv6 "
+                        + "InetAddress instances.");
     }
 
     /**
