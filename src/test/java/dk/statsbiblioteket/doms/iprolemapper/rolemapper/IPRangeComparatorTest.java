@@ -26,13 +26,12 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.InetAddress;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
@@ -53,7 +52,7 @@ public class IPRangeComparatorTest {
     /**
      * @throws java.lang.Exception
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         lowIPv4Address1 = InetAddress.getByName("10.50.0.1");
         lowIPv4Address2 = InetAddress.getByName("10.50.0.42");
@@ -84,27 +83,24 @@ public class IPRangeComparatorTest {
                 highIPv4Address2);
         final IPRange testIPRange2 = new IPRange(lowIPv4Address2,
                 highIPv4Address2);
-        assertEquals("Failed comparing two similar IPRange instances.", 0,
-                comparator.compare(testIPRange1, testIPRange2));
+        assertEquals(0, comparator.compare(testIPRange1, testIPRange2),
+        		"Failed comparing two similar IPRange instances.");
 
-        assertEquals(
-                "Failed comparing an IPv4 InetAddress instances with it self.",
-                0, comparator.compare(testIPRange1, testIPRange1));
+        assertEquals(0, comparator.compare(testIPRange1, testIPRange1),
+                "Failed comparing an IPv4 InetAddress instances with it self.");
 
         // Test comparison with a lower, however, overlapping IP range.
         final IPRange smallerRange1 = new IPRange(lowIPv4Address1,
                 highIPv4Address1);
-        assertEquals(
+        assertEquals(-1, comparator.compare(smallerRange1, testIPRange1),
                 "Failed performing a \"less than\" comparison of two IPv4 "
-                        + "IPRange instances.", -1, comparator.compare(
-                        smallerRange1, testIPRange1));
+                        + "IPRange instances.");
 
         // Test comparison with a higher, however, overlapping IP range. That
         // is, "the other way around".
-        assertEquals(
+        assertEquals(1, comparator.compare(testIPRange1, smallerRange1),
                 "Failed performing a \"greater than\" comparison of two IPv4 "
-                        + "IPRange instances.", 1, comparator.compare(
-                        testIPRange1, smallerRange1));
+                        + "IPRange instances.");
 
         // Test comparison with lower/higher ranges, having the same start
         // address.
@@ -112,15 +108,13 @@ public class IPRangeComparatorTest {
                 lowIPv4Address2);
         final IPRange largerRange2 = new IPRange(lowIPv4Address1,
                 highIPv4Address2);
-        assertEquals(
+        assertEquals(-1, comparator.compare(smallerRange2, largerRange2),
                 "Failed performing a \"less than\" comparison of two IPv4 "
-                        + "IPRange instances.", -1, comparator.compare(
-                        smallerRange2, largerRange2));
+                        + "IPRange instances.");
 
-        assertEquals(
+        assertEquals(1, comparator.compare(largerRange2, smallerRange2),
                 "Failed performing a \"greater than\" comparison of two IPv4 "
-                        + "IPRange instances.", 1, comparator.compare(
-                        largerRange2, smallerRange2));
+                        + "IPRange instances.");
 
         // Test comparison with lower/higher ranges, having the same end
         // address.
@@ -128,15 +122,13 @@ public class IPRangeComparatorTest {
                 highIPv4Address2);
         final IPRange largerRange3 = new IPRange(lowIPv4Address2,
                 highIPv4Address2);
-        assertEquals(
+        assertEquals(-1, comparator.compare(smallerRange3, largerRange3),
                 "Failed performing a \"less than\" comparison of two IPv4 "
-                        + "IPRange instances.", -1, comparator.compare(
-                        smallerRange3, largerRange3));
+                        + "IPRange instances.");
 
-        assertEquals(
+        assertEquals(1, comparator.compare(largerRange3, smallerRange3),
                 "Failed performing a \"greater than\" comparison of two IPv4 "
-                        + "IPRange instances.", 1, comparator.compare(
-                        largerRange3, smallerRange3));
+                        + "IPRange instances.");
 
     }
 
@@ -154,27 +146,24 @@ public class IPRangeComparatorTest {
                 highIPv6Address2);
         final IPRange testIPRange2 = new IPRange(lowIPv6Address2,
                 highIPv6Address2);
-        assertEquals("Failed comparing two similar IPRange instances.", 0,
-                comparator.compare(testIPRange1, testIPRange2));
+        assertEquals(0, comparator.compare(testIPRange1, testIPRange2),
+        		"Failed comparing two similar IPRange instances.");
 
-        assertEquals(
-                "Failed comparing an IPv6 InetAddress instances with it self.",
-                0, comparator.compare(testIPRange1, testIPRange1));
+        assertEquals(0, comparator.compare(testIPRange1, testIPRange1),
+                "Failed comparing an IPv6 InetAddress instances with it self.");
 
         // Test comparison with a lower, however, overlapping IP range.
         final IPRange smallerRange1 = new IPRange(lowIPv6Address1,
                 highIPv6Address1);
-        assertEquals(
+        assertEquals(-1, comparator.compare(smallerRange1, testIPRange1),
                 "Failed performing a \"less than\" comparison of two IPv6 "
-                        + "IPRange instances.", -1, comparator.compare(
-                        smallerRange1, testIPRange1));
+                        + "IPRange instances.");
 
         // Test comparison with a higher, however, overlapping IP range. That
         // is, "the other way around".
-        assertEquals(
+        assertEquals(1, comparator.compare(testIPRange1, smallerRange1),
                 "Failed performing a \"greater than\" comparison of two IPv6 "
-                        + "IPRange instances.", 1, comparator.compare(
-                        testIPRange1, smallerRange1));
+                        + "IPRange instances.");
 
         // Test comparison with lower/higher ranges, having the same start
         // address.
@@ -182,15 +171,13 @@ public class IPRangeComparatorTest {
                 lowIPv6Address2);
         final IPRange largerRange2 = new IPRange(lowIPv6Address1,
                 highIPv6Address2);
-        assertEquals(
+        assertEquals(-1, comparator.compare(smallerRange2, largerRange2),
                 "Failed performing a \"less than\" comparison of two IPv6 "
-                        + "IPRange instances.", -1, comparator.compare(
-                        smallerRange2, largerRange2));
+                        + "IPRange instances.");
 
-        assertEquals(
+        assertEquals(1, comparator.compare(largerRange2, smallerRange2),
                 "Failed performing a \"greater than\" comparison of two IPv6 "
-                        + "IPRange instances.", 1, comparator.compare(
-                        largerRange2, smallerRange2));
+                        + "IPRange instances.");
 
         // Test comparison with lower/higher ranges, having the same end
         // address.
@@ -198,15 +185,13 @@ public class IPRangeComparatorTest {
                 highIPv6Address2);
         final IPRange largerRange3 = new IPRange(lowIPv6Address2,
                 highIPv6Address2);
-        assertEquals(
+        assertEquals(-1, comparator.compare(smallerRange3, largerRange3),
                 "Failed performing a \"less than\" comparison of two IPv6 "
-                        + "IPRange instances.", -1, comparator.compare(
-                        smallerRange3, largerRange3));
+                        + "IPRange instances.");
 
-        assertEquals(
+        assertEquals(1, comparator.compare(largerRange3, smallerRange3),
                 "Failed performing a \"greater than\" comparison of two IPv6 "
-                        + "IPRange instances.", 1, comparator.compare(
-                        largerRange3, smallerRange3));
+                        + "IPRange instances.");
 
     }
 

@@ -26,15 +26,13 @@
  */
 package dk.statsbiblioteket.doms.iprolemapper.rolemapper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
