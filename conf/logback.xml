@@ -2,9 +2,9 @@
     <contextName>avischk-web-qa</contextName>
  
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <file>${catalina.base}/logs/avischk-web-qa.log</file>
+      <file>${catalina.base}/logs/ip-rolemapper.log</file>
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${catalina.base}/logs/avischk-web-qa.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <fileNamePattern>${catalina.base}/logs/ip-rolemapper.%d{yyyy-MM-dd}.log</fileNamePattern>
         <maxHistory>30</maxHistory>
       </rollingPolicy>
  
