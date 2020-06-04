@@ -27,15 +27,19 @@
 package dk.statsbiblioteket.doms.iprolemapper.utils;
 
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -81,7 +85,8 @@ public class EZProxyConfigConverter {
             System.exit(1);
         }
 
-        final Reader ezReader = new FileReader(args[0]);
+        final Reader ezReader = new InputStreamReader(new FileInputStream(args[0]),
+        		Charset.forName("UTF-8"));
         final StreamTokenizer ezTokenizer = new StreamTokenizer(ezReader);
         ezTokenizer.resetSyntax();
         ezTokenizer.whitespaceChars(' ', ' ');
@@ -107,7 +112,7 @@ public class EZProxyConfigConverter {
                 // them.
                 break;
             case StreamTokenizer.TT_WORD:
-                if ("ip".equals(ezTokenizer.sval.toLowerCase())) {
+                if ("ip".equals(ezTokenizer.sval.toLowerCase(Locale.ROOT))) {
                     // Expect an IP address range.
                     ipRanges.add(readIPRange(ezTokenizer, roles));
                 } else {
@@ -161,7 +166,7 @@ public class EZProxyConfigConverter {
         final DataOutputStream dataOutputStream = new DataOutputStream(
                 new FileOutputStream(args[1]));
         dataOutputStream.write(DOM.domToString(ipRangeMapperConfig, true)
-                .getBytes());
+                .getBytes(Charset.forName("UTF-8")));
     }
 
     /**
