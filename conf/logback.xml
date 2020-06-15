@@ -1,5 +1,5 @@
 <included>
-    <contextName>avischk-web-qa</contextName>
+    <contextName>ip-rolemapper</contextName>
  
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
       <file>${catalina.base}/logs/ip-rolemapper.log</file>
