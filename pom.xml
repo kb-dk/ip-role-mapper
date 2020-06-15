@@ -168,7 +168,7 @@
                 <configuration>
                     <useTestScope>true</useTestScope>
                     <webApp>
-                        <contextPath>/java-webapp/</contextPath>
+                        <contextPath>/ip-rolemapper/</contextPath>
                         <descriptor>${project.basedir}/src/main/webapp/WEB-INF/web.xml</descriptor>
                         <jettyEnvXml>${project.basedir}/target/jetty-res/jetty-env.xml</jettyEnvXml>
                     </webApp>
