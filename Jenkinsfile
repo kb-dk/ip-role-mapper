@@ -70,12 +70,8 @@ openshift.withCluster() { // Use "default" cluster or fallback to OpenShift clus
                 }
 
                 stage('Cleanup') {
-                    if (env.BRANCH_NAME == 'master') {
-                        echo "On master branch, letting template app run"
-                    } else {
-                        echo "Not on master branch, tearing down"
-                        openshift.selector("project/${projectName}").delete()
-                    }
+                    echo "Cleaning up"
+                    openshift.selector("project/${projectName}").delete()
                 }
             }
         } catch (e) {
