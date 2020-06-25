@@ -34,7 +34,7 @@ openshift.withCluster() { // Use "default" cluster or fallback to OpenShift clus
                 }
 
                 stage('Mvn clean package') {
-                    sh "${mvnCmd} -DskipTests clean package"
+                    sh "${mvnCmd} clean package"
                 }
 
                 stage('Analyze build results') {            
