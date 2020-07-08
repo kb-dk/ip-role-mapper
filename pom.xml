@@ -26,9 +26,9 @@
     </repositories>
 
     <scm>
-        <url>https://github.com/statsbiblioteket/ip-role-mapper</url>
-        <connection>scm:git:git@github.com:statsbiblioteket/ip-role-mapper.git</connection>
-        <developerConnection>scm:git:git@github.com:statsbiblioteket/ip-role-mapper.git</developerConnection>
+        <url>https://github.com/kb-dk/ip-role-mapper</url>
+        <connection>scm:git:git@github.com:kb-dk/ip-role-mapper.git</connection>
+        <developerConnection>scm:git:git@github.com:kb-dk/ip-role-mapper.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
