@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context override="true" docBase="${user.home}/services/tomcat-apps/ip-role-mapper.war">
+
+    <Environment name="ip-rolemapper-logback-config"
+        value="${user.home}/services/conf/logback.xml"
+        type="java.lang.String"
+        override="false"/>
+    <Environment name="ip-ranges-config"
+        value="${user.home}/services/conf/ipRangesAndRoles.xml"
+        type="java.lang.String"
+        override="false"/>
+
+</Context>
