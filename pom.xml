@@ -9,7 +9,7 @@
 
     <groupId>dk.statsbiblioteket.doms</groupId>
     <artifactId>ip-rolemapper</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <repositories>
@@ -29,7 +29,7 @@
         <url>https://github.com/kb-dk/ip-role-mapper</url>
         <connection>scm:git:git@github.com:kb-dk/ip-role-mapper.git</connection>
         <developerConnection>scm:git:git@github.com:kb-dk/ip-role-mapper.git</developerConnection>
-        <tag>ip-rolemapper-1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
