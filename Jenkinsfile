@@ -69,6 +69,17 @@ openshift.withCluster() { // Use "default" cluster or fallback to OpenShift clus
                     }
                 }
 
+                stage('Promote image') {
+                    if (env.BRANCH_NAME == 'master') {
+                        configFileProvider([configFile(fileId: "imagePromoter", variable: 'promoter')]) {
+                            def promoter = load promoter
+                            promoter.promoteImage("ip-rolemapper", "${projectName}",  "medieplatform", "latest")
+                        }
+                    } else {
+                        echo "Branch ${env.BRANCH_NAME} is not master, so no mvn deploy"
+                    }
+                }
+
                 stage('Cleanup') {
                     echo "Cleaning up"
                     openshift.selector("project/${projectName}").delete()
