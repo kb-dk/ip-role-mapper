@@ -51,7 +51,7 @@ openshift.withCluster() { // Use "default" cluster or fallback to OpenShift clus
                         stage("Create build and deploy application") { 
                             openshift.newBuild("--strategy source", "--binary", "-i kb-infra/kb-s2i-tomcat90", "--name ip-rolemapper")
                             openshift.startBuild("ip-rolemapper", "--from-dir=.", "--follow")
-                            openshift.newApp("ip-rolemapper:latest")
+                            openshift.newApp("ip-rolemapper", "-e BUILD_NUMBER=latest")
                             openshift.create("route", "edge", "--service=ip-rolemapper")
                         }
                     }
